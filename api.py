@@ -8,6 +8,7 @@ import logging
 import asyncio
 import uuid
 from python.tools import memory_tool, knowledge_tool, online_knowledge_tool
+# Removed any potential Docker-related imports
 
 load_dotenv()
 
