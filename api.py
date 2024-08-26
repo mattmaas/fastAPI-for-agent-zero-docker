@@ -115,20 +115,23 @@ async def run_agent(request: AgentRequest):
 @app.post("/remember")
 async def remember(request: MemoryRequest):
     agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
-    result = await asyncio.to_thread(memory_tool.save, agent, request.text)
-    return {"result": result}
+    tool = memory_tool.Memory(agent=agent, name="memory", args={"memorize": request.text}, message="")
+    result = await asyncio.to_thread(tool.execute)
+    return {"result": result.message}
 
 @app.post("/forget")
 async def forget(request: RecallRequest):
     agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
-    result = await asyncio.to_thread(memory_tool.forget, agent, request.prompt)
-    return {"result": result}
+    tool = memory_tool.Memory(agent=agent, name="memory", args={"forget": request.prompt}, message="")
+    result = await asyncio.to_thread(tool.execute)
+    return {"result": result.message}
 
 @app.post("/recall")
 async def recall(request: RecallRequest):
     agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
-    result = await asyncio.to_thread(memory_tool.search, agent, request.prompt, request.count, request.threshold)
-    return {"result": result}
+    tool = memory_tool.Memory(agent=agent, name="memory", args={"query": request.prompt, "count": request.count, "threshold": request.threshold}, message="")
+    result = await asyncio.to_thread(tool.execute)
+    return {"result": result.message}
 
 @app.post("/research")
 async def research(request: ResearchRequest):
