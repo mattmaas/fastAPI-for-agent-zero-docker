@@ -143,7 +143,7 @@ async def research(request: ResearchRequest):
 async def perplexity_search(request: ResearchRequest):
     agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
     tool = online_knowledge_tool.OnlineKnowledge(agent=agent, name="online_knowledge", args={"prompt": request.prompt}, message="")
-    response = await tool.execute()
+    response = await asyncio.to_thread(tool.execute)
     return {"result": response.message}
 
 if __name__ == "__main__":
