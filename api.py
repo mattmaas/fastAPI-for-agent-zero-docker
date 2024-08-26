@@ -38,12 +38,15 @@ class AgentRequest(BaseModel):
     timeout: int | None = None
 
 class MemoryRequest(BaseModel):
-    text: str
+    prompt: str
 
 class RecallRequest(BaseModel):
     prompt: str
     count: int = 5
     threshold: float = 0.1
+
+class ForgetRequest(BaseModel):
+    prompt: str
 
 class ResearchRequest(BaseModel):
     prompt: str
@@ -118,12 +121,12 @@ async def run_agent(request: AgentRequest):
 @app.post("/remember")
 async def remember(request: MemoryRequest):
     agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
-    tool = memory_tool.Memory(agent=agent, name="memory", args={"memorize": request.text}, message="")
+    tool = memory_tool.Memory(agent=agent, name="memory", args={"memorize": request.prompt}, message="")
     result = await tool.execute()
     return {"result": result.message}
 
 @app.post("/forget")
-async def forget(request: RecallRequest):
+async def forget(request: ForgetRequest):
     agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
     tool = memory_tool.Memory(agent=agent, name="memory", args={"forget": request.prompt}, message="")
     result = await tool.execute()
