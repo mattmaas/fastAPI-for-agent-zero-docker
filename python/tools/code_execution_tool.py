@@ -10,23 +10,17 @@ from python.helpers import files
 from python.helpers.print_style import PrintStyle
 from python.helpers.shell_local import LocalInteractiveSession
 from python.helpers.shell_ssh import SSHInteractiveSession
-from python.helpers.docker import DockerContainerManager
 
 @dataclass
 class State:
     shell: LocalInteractiveSession | SSHInteractiveSession
-    docker: DockerContainerManager | None
-        
 
 class CodeExecution(Tool):
 
     def execute(self,**kwargs):
-
         if self.agent.handle_intervention(): return Response(message="", break_loop=False)  # wait for intervention and handle it, if paused
         
         self.prepare_state()
-
-        # os.chdir(files.get_abs_path("./work_dir")) #change CWD to work_dir
         
         runtime = self.args["runtime"].lower().strip()
         if runtime == "python":
@@ -50,19 +44,12 @@ class CodeExecution(Tool):
     def prepare_state(self):
         self.state = self.agent.get_data("cot_state")
         if not self.state:
-
-            #initialize docker container if execution in docker is configured
-            if self.agent.config.code_exec_docker_enabled:
-                docker = DockerContainerManager(name=self.agent.config.code_exec_docker_name, image=self.agent.config.code_exec_docker_image, ports=self.agent.config.code_exec_docker_ports, volumes=self.agent.config.code_exec_docker_volumes)
-                docker.start_container()
-            else: docker = None
-
-            #initialize local or remote interactive shell insterface
             if self.agent.config.code_exec_ssh_enabled:
                 shell = SSHInteractiveSession(self.agent.config.code_exec_ssh_addr,self.agent.config.code_exec_ssh_port,self.agent.config.code_exec_ssh_user,self.agent.config.code_exec_ssh_pass)
-            else: shell = LocalInteractiveSession()
-                
-            self.state = State(shell=shell,docker=docker)
+            else:
+                shell = LocalInteractiveSession()
+            
+            self.state = State(shell=shell)
             shell.connect()
         self.agent.set_data("cot_state", self.state)
     
@@ -80,7 +67,6 @@ class CodeExecution(Tool):
         return self.terminal_session(command)
 
     def terminal_session(self, command):
-
         if self.agent.handle_intervention(): return ""  # wait for intervention and handle it, if paused
        
         self.state.shell.send_command(command)
