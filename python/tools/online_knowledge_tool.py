@@ -1,6 +1,7 @@
 from agent import Agent
 from python.helpers import perplexity_search
 from python.helpers.tool import Tool, Response
+import asyncio
 
 class OnlineKnowledge(Tool):
     async def execute(self, **kwargs):
@@ -10,5 +11,5 @@ class OnlineKnowledge(Tool):
         )
 
 async def process_prompt(prompt):
-    result = await perplexity_search.perplexity_search(prompt)
+    result = await asyncio.to_thread(perplexity_search.perplexity_search, prompt)
     return str(result)

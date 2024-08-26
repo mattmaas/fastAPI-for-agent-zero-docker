@@ -3,7 +3,7 @@ from openai import OpenAI
 import models
 import logging
 
-async def perplexity_search(query:str, model_name="llama-3.1-sonar-large-128k-online",api_key=None,base_url="https://api.perplexity.ai"):    
+def perplexity_search(query:str, model_name="llama-3.1-sonar-large-128k-online",api_key=None,base_url="https://api.perplexity.ai"):    
     logging.info(f"Perplexity search called with query: {query}")
     
     api_key = api_key or models.get_api_key("perplexity")
@@ -22,7 +22,7 @@ async def perplexity_search(query:str, model_name="llama-3.1-sonar-large-128k-on
     
     try:
         logging.info("Sending request to Perplexity API")
-        response = await client.chat.completions.create(
+        response = client.chat.completions.create(
             model=model_name,
             messages=messages,
         )
