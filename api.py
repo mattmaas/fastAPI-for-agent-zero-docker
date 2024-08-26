@@ -135,9 +135,9 @@ async def research(request: ResearchRequest):
     if not request.prompt:
         raise HTTPException(status_code=400, detail="Prompt is required for research")
     agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
-    tool = knowledge_tool.Knowledge(agent=agent, name="knowledge", args={}, message="")
+    tool = knowledge_tool.Knowledge(agent=agent, name="knowledge", args={"prompt": request.prompt}, message="")
     try:
-        response = await asyncio.to_thread(tool.execute, prompt=request.prompt)
+        response = await asyncio.to_thread(tool.execute)
         return {"result": response.message}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred during research: {str(e)}")
