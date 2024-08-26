@@ -11,6 +11,9 @@ from python.tools import memory_tool, knowledge_tool, online_knowledge_tool
 
 load_dotenv()
 
+# Configure logging
+logging.basicConfig(level=logging.ERROR, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
 app = FastAPI()
 
 # Initialize Agent
@@ -143,6 +146,7 @@ async def research(request: ResearchRequest):
         response = await asyncio.to_thread(tool.execute)
         return {"result": response.message}
     except Exception as e:
+        logging.error(f"Error in research endpoint: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"An error occurred during research: {str(e)}")
 
 @app.post("/perplexity_search")
