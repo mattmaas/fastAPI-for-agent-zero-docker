@@ -10,4 +10,5 @@ class OnlineKnowledge(Tool):
         )
 
 async def process_prompt(prompt):
-    return str(await perplexity_search.perplexity_search(prompt))
+    result = await perplexity_search.perplexity_search(prompt)
+    return str(result)

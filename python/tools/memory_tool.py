@@ -11,16 +11,16 @@ from chromadb.errors import InvalidDimensionException
 db: VectorDB | None= None
 
 class Memory(Tool):
-    def execute(self,**kwargs):
+    async def execute(self,**kwargs):
         result=""
         
         try:
             if "query" in kwargs:
                 threshold = float(kwargs.get("threshold", 0.1))
                 count = int(kwargs.get("count", 5))
-                result = search(self.agent, kwargs["query"], count, threshold)
+                result = await search(self.agent, kwargs["query"], count, threshold)
             elif "memorize" in kwargs:
-                result = save(self.agent, kwargs["memorize"])
+                result = await save(self.agent, kwargs["memorize"])
             elif "forget" in kwargs:
                 result = forget(self.agent, kwargs["forget"])
             elif "delete" in kwargs:
