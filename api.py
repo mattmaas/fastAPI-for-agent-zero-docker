@@ -119,21 +119,21 @@ async def run_agent(request: AgentRequest):
 async def remember(request: MemoryRequest):
     agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
     tool = memory_tool.Memory(agent=agent, name="memory", args={"memorize": request.text}, message="")
-    result = await asyncio.to_thread(tool.execute)
+    result = await tool.execute()
     return {"result": result.message}
 
 @app.post("/forget")
 async def forget(request: RecallRequest):
     agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
     tool = memory_tool.Memory(agent=agent, name="memory", args={"forget": request.prompt}, message="")
-    result = await asyncio.to_thread(tool.execute)
+    result = await tool.execute()
     return {"result": result.message}
 
 @app.post("/recall")
 async def recall(request: RecallRequest):
     agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
     tool = memory_tool.Memory(agent=agent, name="memory", args={"query": request.prompt, "count": request.count, "threshold": request.threshold}, message="")
-    result = await asyncio.to_thread(tool.execute)
+    result = await tool.execute()
     return {"result": result.message}
 
 @app.post("/research")
@@ -155,7 +155,7 @@ async def research(request: ResearchRequest):
 async def perplexity_search(request: ResearchRequest):
     agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
     tool = online_knowledge_tool.OnlineKnowledge(agent=agent, name="online_knowledge", args={"prompt": request.prompt}, message="")
-    response = await asyncio.to_thread(tool.execute)
+    response = await tool.execute()
     return {"result": response.message}
 
 if __name__ == "__main__":
