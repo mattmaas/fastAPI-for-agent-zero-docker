@@ -1,4 +1,5 @@
 import re
+import logging
 from agent import Agent
 from python.helpers.vector_db import VectorDB, Document
 from python.helpers import files
@@ -7,11 +8,16 @@ from python.helpers.tool import Tool, Response
 from python.helpers.print_style import PrintStyle
 from chromadb.errors import InvalidDimensionException
 
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
 # TODO multiple DBs at once
 db: VectorDB | None= None
 
 class Memory(Tool):
     async def execute(self, **kwargs):
+        logger.debug(f"Memory.execute called with kwargs: {kwargs}")
         result = ""
         
         try:
@@ -25,11 +31,19 @@ class Memory(Tool):
                 result = forget(self.agent, kwargs["forget"])
             elif "delete" in kwargs:
                 result = delete(self.agent, kwargs["delete"])
+            else:
+                logger.warning("No recognized operation in kwargs")
+                return Response(message="No recognized operation", break_loop=False)
         except InvalidDimensionException as e:
             # hint about embedding change with existing database
             PrintStyle.hint("If you changed your embedding model, you will need to remove contents of /memory directory.")
-            raise   
+            logger.error(f"InvalidDimensionException: {str(e)}")
+            raise
+        except Exception as e:
+            logger.error(f"Unexpected error in Memory.execute: {str(e)}")
+            return Response(message=f"An error occurred: {str(e)}", break_loop=False)
         
+        logger.debug(f"Memory.execute returning result: {result}")
         return Response(message=result, break_loop=False)
             
 def search(agent:Agent, query:str, count:int=5, threshold:float=0.1):

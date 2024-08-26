@@ -120,30 +120,42 @@ async def run_agent(request: AgentRequest):
 
 @app.post("/remember")
 async def remember(request: MemoryRequest):
-    agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
-    tool = memory_tool.Memory(agent=agent, name="memory", args={"memorize": request.prompt}, message="")
-    result = await tool.execute()
-    return {"result": result.message}
+    try:
+        agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
+        tool = memory_tool.Memory(agent=agent, name="memory", args={"memorize": request.prompt}, message="")
+        result = await tool.execute()
+        return {"result": result.message}
+    except Exception as e:
+        logging.error(f"Error in remember endpoint: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/forget")
 async def forget(request: ForgetRequest):
-    agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
-    tool = memory_tool.Memory(agent=agent, name="memory", args={"forget": request.prompt}, message="")
-    result = await tool.execute()
-    return {"result": result.message}
+    try:
+        agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
+        tool = memory_tool.Memory(agent=agent, name="memory", args={"forget": request.prompt}, message="")
+        result = await tool.execute()
+        return {"result": result.message}
+    except Exception as e:
+        logging.error(f"Error in forget endpoint: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/recall")
 async def recall(request: RecallRequest):
-    agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
-    tool = memory_tool.Memory(agent=agent, name="memory", args={"query": request.prompt, "count": request.count, "threshold": request.threshold}, message="")
-    result = await tool.execute()
-    return {"result": result.message}
+    try:
+        agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
+        tool = memory_tool.Memory(agent=agent, name="memory", args={"query": request.prompt, "count": request.count, "threshold": request.threshold}, message="")
+        result = await tool.execute()
+        return {"result": result.message}
+    except Exception as e:
+        logging.error(f"Error in recall endpoint: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/research")
 async def research(request: ResearchRequest):
     agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
     tool = knowledge_tool.Knowledge(agent=agent, name="knowledge", args={"prompt": request.prompt}, message="")
-    response = await tool.execute()
+    response = await tool.execute(prompt=request.prompt)
     return {"result": response.message}
 
 @app.post("/perplexity_search")

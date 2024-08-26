@@ -19,6 +19,8 @@ class Knowledge(Tool):
     async def execute(self, prompt="", **kwargs):
         logger.debug(f"Knowledge.execute called with prompt: {prompt}")
         if not prompt:
+            prompt = self.args.get("prompt", "")
+        if not prompt:
             logger.warning("No prompt provided for knowledge search")
             return Response(message="No prompt provided for knowledge search", break_loop=False)
 
