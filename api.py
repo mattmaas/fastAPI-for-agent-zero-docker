@@ -138,18 +138,10 @@ async def recall(request: RecallRequest):
 
 @app.post("/research")
 async def research(request: ResearchRequest):
-    if not request.prompt:
-        raise HTTPException(status_code=400, detail="Prompt is required for research")
     agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
     tool = knowledge_tool.Knowledge(agent=agent, name="knowledge", args={}, message="")
-    try:
-        logging.info(f"Starting research with prompt: {request.prompt}")
-        response = await tool.execute(prompt=request.prompt)
-        logging.info(f"Research completed successfully")
-        return {"result": response.message}
-    except Exception as e:
-        logging.error(f"Error in research endpoint: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"An error occurred during research: {str(e)}")
+    response = await tool.execute(prompt=request.prompt)
+    return {"result": response.message}
 
 @app.post("/perplexity_search")
 async def perplexity_search(request: ResearchRequest):
