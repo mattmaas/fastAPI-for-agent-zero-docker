@@ -13,28 +13,33 @@ from python.helpers import files
 from python.helpers.print_style import PrintStyle
 
 class Knowledge(Tool):
-    def execute(self, prompt="", **kwargs):
-        try:
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                # Schedule all search functions to run in parallel
-                perplexity_future = executor.submit(perplexity_search.perplexity_search, prompt)
-                duckduckgo_future = executor.submit(duckduckgo_search.search, prompt)
-                memory_future = executor.submit(memory_tool.search, self.agent, prompt)
+    def execute(self, question="", **kwargs):
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            # Schedule the two functions to be run in parallel
 
-                # Wait for all functions to complete
-                perplexity_result = perplexity_future.result()
-                duckduckgo_result = duckduckgo_future.result()
-                memory_result = memory_future.result()
+            # perplexity search, if API provided
+            if os.getenv("API_KEY_PERPLEXITY"):
+                perplexity = executor.submit(perplexity_search.perplexity_search, question)
+            else: 
+                PrintStyle.hint("No API key provided for Perplexity. Skipping Perplexity search.")
+                perplexity = None
+                
 
-            online_sources = f"Perplexity: {perplexity_result}\n\nDuckDuckGo: {duckduckgo_result}"
+            # duckduckgo search
+            duckduckgo = executor.submit(duckduckgo_search.search, question)
 
-            msg = files.read_file("prompts/tool.knowledge.response.md", 
-                                  online_sources=online_sources,
-                                  memory=memory_result)
+            # memory search
+            future_memory = executor.submit(memory_tool.search, self.agent, question)
 
-            if self.agent.handle_intervention(msg): pass # wait for intervention and handle it, if paused
+            # Wait for both functions to complete
+            perplexity_result = (perplexity.result() if perplexity else "") or ""
+            duckduckgo_result = duckduckgo.result()
+            memory_result = future_memory.result()
 
-            return Response(message=msg, break_loop=False)
-        except Exception as e:
-            logging.error(f"Error in Knowledge.execute: {str(e)}", exc_info=True)
-            return Response(message=f"An error occurred during knowledge gathering: {str(e)}", break_loop=True)
+        msg = files.read_file("prompts/tool.knowledge.response.md", 
+                              online_sources = perplexity_result + "\n\n" + str(duckduckgo_result),
+                              memory = memory_result )
+
+        if self.agent.handle_intervention(msg): pass # wait for intervention and handle it, if paused
+
+        return Response(message=msg, break_loop=False)
