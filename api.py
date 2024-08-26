@@ -122,8 +122,8 @@ async def run_agent(request: AgentRequest):
 async def remember(request: MemoryRequest):
     try:
         agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
-        tool = memory_tool.Memory(agent=agent, name="memory", args={"memorize": request.prompt}, message="")
-        result = await tool.execute()
+        tool = memory_tool.Memory(agent=agent, name="memory", args={}, message="")
+        result = await tool.execute(memorize=request.prompt)
         return {"result": result.message}
     except Exception as e:
         logging.error(f"Error in remember endpoint: {str(e)}")
@@ -133,8 +133,8 @@ async def remember(request: MemoryRequest):
 async def forget(request: ForgetRequest):
     try:
         agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
-        tool = memory_tool.Memory(agent=agent, name="memory", args={"forget": request.prompt}, message="")
-        result = await tool.execute()
+        tool = memory_tool.Memory(agent=agent, name="memory", args={}, message="")
+        result = await tool.execute(forget=request.prompt)
         return {"result": result.message}
     except Exception as e:
         logging.error(f"Error in forget endpoint: {str(e)}")
@@ -144,8 +144,8 @@ async def forget(request: ForgetRequest):
 async def recall(request: RecallRequest):
     try:
         agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
-        tool = memory_tool.Memory(agent=agent, name="memory", args={"query": request.prompt, "count": request.count, "threshold": request.threshold}, message="")
-        result = await tool.execute()
+        tool = memory_tool.Memory(agent=agent, name="memory", args={}, message="")
+        result = await tool.execute(query=request.prompt, count=request.count, threshold=request.threshold)
         return {"result": result.message}
     except Exception as e:
         logging.error(f"Error in recall endpoint: {str(e)}")

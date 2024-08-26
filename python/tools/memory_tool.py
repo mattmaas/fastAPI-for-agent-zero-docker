@@ -24,12 +24,16 @@ class Memory(Tool):
             if "query" in kwargs:
                 threshold = float(kwargs.get("threshold", 0.1))
                 count = int(kwargs.get("count", 5))
+                logger.debug(f"Executing search with query: {kwargs['query']}, count: {count}, threshold: {threshold}")
                 result = search(self.agent, kwargs["query"], count, threshold)
             elif "memorize" in kwargs:
+                logger.debug(f"Executing save with text: {kwargs['memorize']}")
                 result = save(self.agent, kwargs["memorize"])
             elif "forget" in kwargs:
+                logger.debug(f"Executing forget with query: {kwargs['forget']}")
                 result = forget(self.agent, kwargs["forget"])
             elif "delete" in kwargs:
+                logger.debug(f"Executing delete with ids: {kwargs['delete']}")
                 result = delete(self.agent, kwargs["delete"])
             else:
                 logger.warning("No recognized operation in kwargs")
