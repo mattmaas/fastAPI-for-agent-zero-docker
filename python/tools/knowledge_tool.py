@@ -12,32 +12,23 @@ from python.helpers import files
 from python.helpers.print_style import PrintStyle
 
 class Knowledge(Tool):
-    def execute(self, question="", **kwargs):
+    def execute(self, prompt="", **kwargs):
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            # Schedule the two functions to be run in parallel
+            # Schedule all search functions to run in parallel
+            perplexity_future = executor.submit(perplexity_search.perplexity_search, prompt)
+            duckduckgo_future = executor.submit(duckduckgo_search.search, prompt)
+            memory_future = executor.submit(memory_tool.search, self.agent, prompt)
 
-            # perplexity search, if API provided
-            if os.getenv("API_KEY_PERPLEXITY"):
-                perplexity = executor.submit(perplexity_search.perplexity_search, question)
-            else: 
-                PrintStyle.hint("No API key provided for Perplexity. Skipping Perplexity search.")
-                perplexity = None
-                
+            # Wait for all functions to complete
+            perplexity_result = perplexity_future.result()
+            duckduckgo_result = duckduckgo_future.result()
+            memory_result = memory_future.result()
 
-            # duckduckgo search
-            duckduckgo = executor.submit(duckduckgo_search.search, question)
-
-            # memory search
-            future_memory = executor.submit(memory_tool.search, self.agent, question)
-
-            # Wait for both functions to complete
-            perplexity_result = (perplexity.result() if perplexity else "") or ""
-            duckduckgo_result = duckduckgo.result()
-            memory_result = future_memory.result()
+        online_sources = f"Perplexity: {perplexity_result}\n\nDuckDuckGo: {duckduckgo_result}"
 
         msg = files.read_file("prompts/tool.knowledge.response.md", 
-                              online_sources = perplexity_result + "\n\n" + str(duckduckgo_result),
-                              memory = memory_result )
+                              online_sources=online_sources,
+                              memory=memory_result)
 
         if self.agent.handle_intervention(msg): pass # wait for intervention and handle it, if paused
 

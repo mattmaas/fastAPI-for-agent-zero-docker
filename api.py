@@ -136,8 +136,11 @@ async def research(request: ResearchRequest):
         raise HTTPException(status_code=400, detail="Prompt is required for research")
     agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
     tool = knowledge_tool.Knowledge(agent=agent, name="knowledge", args={}, message="")
-    response = await tool.execute(prompt=request.prompt)
-    return {"result": response.message}
+    try:
+        response = await asyncio.to_thread(tool.execute, prompt=request.prompt)
+        return {"result": response.message}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred during research: {str(e)}")
 
 @app.post("/perplexity_search")
 async def perplexity_search(request: ResearchRequest):
