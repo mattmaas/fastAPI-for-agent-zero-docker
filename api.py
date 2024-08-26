@@ -143,7 +143,9 @@ async def research(request: ResearchRequest):
     agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
     tool = knowledge_tool.Knowledge(agent=agent, name="knowledge", args={"prompt": request.prompt}, message="")
     try:
+        logging.info(f"Starting research with prompt: {request.prompt}")
         response = await asyncio.to_thread(tool.execute)
+        logging.info(f"Research completed successfully")
         return {"result": response.message}
     except Exception as e:
         logging.error(f"Error in research endpoint: {str(e)}", exc_info=True)
