@@ -139,8 +139,8 @@ async def recall(request: RecallRequest):
 @app.post("/research")
 async def research(request: ResearchRequest):
     agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
-    tool = knowledge_tool.Knowledge(agent=agent, name="knowledge", args={}, message="")
-    response = await tool.execute(prompt=request.prompt)
+    tool = knowledge_tool.Knowledge(agent=agent, name="knowledge", args={"prompt": request.prompt}, message="")
+    response = await tool.execute()
     return {"result": response.message}
 
 @app.post("/perplexity_search")
