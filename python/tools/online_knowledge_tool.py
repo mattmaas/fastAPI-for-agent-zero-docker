@@ -5,9 +5,9 @@ from python.helpers.tool import Tool, Response
 class OnlineKnowledge(Tool):
     def execute(self,**kwargs):
         return Response(
-            message=process_question(self.args["question"]),
+            message=process_prompt(self.args["prompt"]),
             break_loop=False,
         )
 
-def process_question(question):
-    return str(perplexity_search.perplexity_search(question))
+def process_prompt(prompt):
+    return str(perplexity_search.perplexity_search(prompt))
