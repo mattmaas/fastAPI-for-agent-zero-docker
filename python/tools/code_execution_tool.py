@@ -36,7 +36,7 @@ class CodeExecution(Tool):
         if not response: response = files.read_file("./prompts/fw.code_no_output.md")
         return Response(message=response, break_loop=False)
 
-    def after_execution(self, response, **kwargs):
+    async def after_execution(self, response, **kwargs):
         msg_response = files.read_file("./prompts/fw.tool_response.md", tool_name=self.name, tool_response=response.message)
         self.agent.append_message(msg_response, human=True)
 
