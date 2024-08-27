@@ -233,16 +233,16 @@ class Agent:
     async def process_tools(self, msg: str):
         # search for tool usage requests in agent message
         tool_request = extract_tools.json_parse_dirty(msg)
-    	print(f"Tool request: {tool_request}")  # Debug print
+        print(f"Tool request: {tool_request}")  # Debug print
 
         if tool_request is not None:
             tool_name = tool_request.get("tool_name", "")
             tool_args = tool_request.get("tool_args", {})
-        	print(f"Requested tool: {tool_name}, args: {tool_args}")  # Debug print
+            print(f"Requested tool: {tool_name}, args: {tool_args}")  # Debug print
 
             try:
                 tool = await self.get_tool(tool_name, tool_args, msg)
-            	print(f"Created tool: {tool}")  # Debug print
+                print(f"Created tool: {tool}")  # Debug print
                 
                 if await self.handle_intervention(): return # wait if paused and handle intervention message if needed
                 await tool.before_execution(**tool_args)
