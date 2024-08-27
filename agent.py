@@ -299,6 +299,7 @@ class Agent:
             from python.tools import memory_tool
             messages = self.concat_messages(self.history)
             memories = await memory_tool.search(self, messages)
+            memories = await memories  # Ensure the result is fully resolved
             input = {
                 "conversation_history" : messages,
                 "raw_memories": memories
