@@ -238,19 +238,21 @@ class Agent:
             tool_name = tool_request.get("tool_name", "")
             tool_args = tool_request.get("tool_args", {})
 
-            tool = await self.get_tool(
-                        tool_name,
-                        tool_args,
-                        msg)
+            try:
+                tool = await self.get_tool(tool_name, tool_args, msg)
                 
-            if await self.handle_intervention(): return # wait if paused and handle intervention message if needed
-            await tool.before_execution(**tool_args)
-            if await self.handle_intervention(): return # wait if paused and handle intervention message if needed
-            response = await tool.execute(**tool_args)
-            if await self.handle_intervention(): return # wait if paused and handle intervention message if needed
-            await tool.after_execution(response)
-            if await self.handle_intervention(): return # wait if paused and handle intervention message if needed
-            if response.break_loop: return response.message
+                if await self.handle_intervention(): return # wait if paused and handle intervention message if needed
+                await tool.before_execution(**tool_args)
+                if await self.handle_intervention(): return # wait if paused and handle intervention message if needed
+                response = await tool.execute(**tool_args)
+                if await self.handle_intervention(): return # wait if paused and handle intervention message if needed
+                await tool.after_execution(response)
+                if await self.handle_intervention(): return # wait if paused and handle intervention message if needed
+                if response.break_loop: return response.message
+            except Exception as e:
+                error_msg = f"Error processing tool '{tool_name}': {str(e)}"
+                self.append_message(error_msg, human=True)
+                PrintStyle(font_color="red", padding=True).print(error_msg)
         else:
             msg = files.read_file("prompts/fw.msg_misformat.md")
             self.append_message(msg, human=True)
@@ -262,14 +264,17 @@ class Agent:
         from python.helpers.tool import Tool
         
         tool_class = Unknown
-        if files.exists("python/tools",f"{name}.py"): 
+        if files.exists("python/tools", f"{name}.py"): 
             module = importlib.import_module("python.tools." + name)  # Import the module
-            class_list = inspect.getmembers(module, inspect.isclass)  # Get all functions in the module
+            class_list = inspect.getmembers(module, inspect.isclass)  # Get all classes in the module
 
             for cls in class_list:
                 if cls[1] is not Tool and issubclass(cls[1], Tool):
                     tool_class = cls[1]
                     break
+
+        if tool_class is Unknown:
+            print(f"Warning: No specific tool found for '{name}'. Using Unknown tool.")
 
         return tool_class(agent=self, name=name, args=args, message=message, **kwargs)
 
