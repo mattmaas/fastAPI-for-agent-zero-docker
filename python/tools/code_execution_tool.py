@@ -16,16 +16,16 @@ class State:
 
 class CodeExecution(Tool):
 
-    def execute(self,**kwargs):
-        if self.agent.handle_intervention(): return Response(message="", break_loop=False)  # wait for intervention and handle it, if paused
+    async def execute(self, **kwargs):
+        if await self.agent.handle_intervention(): return Response(message="", break_loop=False)  # wait for intervention and handle it, if paused
         
         self.prepare_state()
         
         runtime = self.args["runtime"].lower().strip()
         if runtime == "python":
-            response = self.execute_python_code(self.args["code"])
+            response = await self.execute_python_code(self.args["code"])
         elif runtime == "nodejs":
-            response = self.execute_nodejs_code(self.args["code"])
+            response = await self.execute_nodejs_code(self.args["code"])
         elif runtime == "terminal":
             response = self.execute_terminal_command(self.args["code"])
         elif runtime == "output":
