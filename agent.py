@@ -233,13 +233,16 @@ class Agent:
     async def process_tools(self, msg: str):
         # search for tool usage requests in agent message
         tool_request = extract_tools.json_parse_dirty(msg)
+    	print(f"Tool request: {tool_request}")  # Debug print
 
         if tool_request is not None:
             tool_name = tool_request.get("tool_name", "")
             tool_args = tool_request.get("tool_args", {})
+        	print(f"Requested tool: {tool_name}, args: {tool_args}")  # Debug print
 
             try:
                 tool = await self.get_tool(tool_name, tool_args, msg)
+            	print(f"Created tool: {tool}")  # Debug print
                 
                 if await self.handle_intervention(): return # wait if paused and handle intervention message if needed
                 await tool.before_execution(**tool_args)
@@ -259,24 +262,31 @@ class Agent:
             PrintStyle(font_color="red", padding=True).print(msg)
 
 
-    async def get_tool(self, name: str, args: dict, message: str, **kwargs):
-        from python.tools.unknown import Unknown 
-        from python.helpers.tool import Tool
+	async def get_tool(self, name: str, args: dict, message: str, **kwargs):
+	    print(f"Getting tool: {name}")  # Debug print
+	    from python.tools.unknown import Unknown 
+	    from python.helpers.tool import Tool
+	    from python.tools.response import ResponseTool  # Import ResponseTool
+	
+	    tool_class = Unknown
+	    if name == "response":
+	        tool_class = ResponseTool
+	    elif files.exists("python/tools", f"{name}.py"): 
+	        module = importlib.import_module("python.tools." + name)
+	        class_list = inspect.getmembers(module, inspect.isclass)
+	
+	        for cls in class_list:
+	            if cls[1] is not Tool and issubclass(cls[1], Tool):
+	                tool_class = cls[1]
+	                break
+
+    	if tool_class is Unknown:
+        print(f"Warning: No specific tool found for '{name}'. Using Unknown tool.") 
         
-        tool_class = Unknown
-        if files.exists("python/tools", f"{name}.py"): 
-            module = importlib.import_module("python.tools." + name)  # Import the module
-            class_list = inspect.getmembers(module, inspect.isclass)  # Get all classes in the module
+    	print(f"Tool name: {name}")
+    	print(f"Tool class: {tool_class}")
 
-            for cls in class_list:
-                if cls[1] is not Tool and issubclass(cls[1], Tool):
-                    tool_class = cls[1]
-                    break
-
-        if tool_class is Unknown:
-            print(f"Warning: No specific tool found for '{name}'. Using Unknown tool.")
-
-        return tool_class(agent=self, name=name, args=args, message=message, **kwargs)
+    	return tool_class(agent=self, name=name, args=args, message=message, **kwargs)
 
     async def fetch_memories(self,reset_skip=False):
         if self.config.auto_memory_count<=0: return ""
