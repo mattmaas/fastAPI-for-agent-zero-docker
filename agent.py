@@ -279,13 +279,13 @@ class Agent:
                     tool_class = cls[1]
                     break
 
-    	if tool_class is Unknown:
-        print(f"Warning: No specific tool found for '{name}'. Using Unknown tool.") 
+        if tool_class is Unknown:
+            print(f"Warning: No specific tool found for '{name}'. Using Unknown tool.") 
         
-    	print(f"Tool name: {name}")
-    	print(f"Tool class: {tool_class}")
+        print(f"Tool name: {name}")
+        print(f"Tool class: {tool_class}")
 
-    	return tool_class(agent=self, name=name, args=args, message=message, **kwargs)
+        return tool_class(agent=self, name=name, args=args, message=message, **kwargs)
 
     async def fetch_memories(self,reset_skip=False):
         if self.config.auto_memory_count<=0: return ""
