@@ -261,24 +261,23 @@ class Agent:
             self.append_message(msg, human=True)
             PrintStyle(font_color="red", padding=True).print(msg)
 
-
-	async def get_tool(self, name: str, args: dict, message: str, **kwargs):
-	    print(f"Getting tool: {name}")  # Debug print
-	    from python.tools.unknown import Unknown 
-	    from python.helpers.tool import Tool
-	    from python.tools.response import ResponseTool  # Import ResponseTool
-	
-	    tool_class = Unknown
-	    if name == "response":
-	        tool_class = ResponseTool
-	    elif files.exists("python/tools", f"{name}.py"): 
-	        module = importlib.import_module("python.tools." + name)
-	        class_list = inspect.getmembers(module, inspect.isclass)
-	
-	        for cls in class_list:
-	            if cls[1] is not Tool and issubclass(cls[1], Tool):
-	                tool_class = cls[1]
-	                break
+    async def get_tool(self, name: str, args: dict, message: str, **kwargs):
+        print(f"Getting tool: {name}")  # Debug print
+        from python.tools.unknown import Unknown 
+        from python.helpers.tool import Tool
+        from python.tools.response import ResponseTool  # Import ResponseTool
+    
+        tool_class = Unknown
+        if name == "response":
+            tool_class = ResponseTool
+        elif files.exists("python/tools", f"{name}.py"): 
+            module = importlib.import_module("python.tools." + name)
+            class_list = inspect.getmembers(module, inspect.isclass)
+    
+            for cls in class_list:
+                if cls[1] is not Tool and issubclass(cls[1], Tool):
+                    tool_class = cls[1]
+                    break
 
     	if tool_class is Unknown:
         print(f"Warning: No specific tool found for '{name}'. Using Unknown tool.") 
