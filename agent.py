@@ -80,7 +80,6 @@ class Agent:
                 self.intervention_status = False # reset interventon status
 
                 try:
-
                     system = self.system_prompt + "\n\n" + self.tools_prompt
                     memories = await self.fetch_memories()
                     if memories: system+= "\n\n"+memories
