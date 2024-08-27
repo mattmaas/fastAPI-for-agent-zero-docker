@@ -1,4 +1,4 @@
-import threading, time, models, os
+import threading, time, models, os, asyncio
 from ansio import application_keypad, mouse_input, raw_input
 from ansio.input import InputEvent, get_input_event
 from agent import Agent, AgentConfig
