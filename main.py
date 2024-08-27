@@ -12,7 +12,7 @@ input_lock = threading.Lock()
 os.chdir(files.get_abs_path("./work_dir")) #change CWD to work_dir
 
 
-def initialize():
+async def initialize():
     
     # main chat model used by agents (smarter, more accurate)
     chat_llm = models.get_openai_chat(model_name="gpt-4o-mini", temperature=0)
@@ -66,11 +66,11 @@ def initialize():
     agent0 = Agent( number = 0, config = config )
 
     # start the chat loop
-    chat(agent0)
+    await chat(agent0)
 
 
 # Main conversation loop
-def chat(agent:Agent):
+async def chat(agent:Agent):
     
     # start the conversation loop  
     while True:
@@ -104,7 +104,7 @@ def chat(agent:Agent):
         if user_input.lower() == 'e': break
 
         # send message to agent0, 
-        assistant_response = agent.message_loop(user_input)
+        assistant_response = await agent.message_loop(user_input)
         
         # print agent0 response
         PrintStyle(font_color="white",background_color="#1D8348", bold=True, padding=True).print(f"{agent.agent_name}: reponse:")        
@@ -154,4 +154,4 @@ if __name__ == "__main__":
     threading.Thread(target=capture_keys, daemon=True).start()
 
     # Start the chat
-    initialize()
+    asyncio.run(initialize())
