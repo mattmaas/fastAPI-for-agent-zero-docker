@@ -244,11 +244,11 @@ class Agent:
                         msg)
                 
             if await self.handle_intervention(): return # wait if paused and handle intervention message if needed
-            tool.before_execution(**tool_args)
+            await tool.before_execution(**tool_args)
             if await self.handle_intervention(): return # wait if paused and handle intervention message if needed
             response = await tool.execute(**tool_args)
             if await self.handle_intervention(): return # wait if paused and handle intervention message if needed
-            tool.after_execution(response)
+            await tool.after_execution(response)
             if await self.handle_intervention(): return # wait if paused and handle intervention message if needed
             if response.break_loop: return response.message
         else:

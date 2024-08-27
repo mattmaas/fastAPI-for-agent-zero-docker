@@ -18,7 +18,7 @@ class Tool:
         self.message = message
 
     @abstractmethod
-    def execute(self,**kwargs) -> Response:
+    async def execute(self, **kwargs) -> Response:
         pass
 
     def before_execution(self, **kwargs):
