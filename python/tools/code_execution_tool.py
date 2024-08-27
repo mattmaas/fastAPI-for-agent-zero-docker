@@ -12,7 +12,7 @@ from python.helpers.shell_local import LocalInteractiveSession
 
 @dataclass
 class State:
-    shell: LocalInteractiveSession | SSHInteractiveSession
+    shell: LocalInteractiveSession
 
 class CodeExecution(Tool):
 
