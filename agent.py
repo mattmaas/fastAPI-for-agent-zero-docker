@@ -67,12 +67,12 @@ class Agent:
         os.chdir(files.get_abs_path("./work_dir")) #change CWD to work_dir
         
 
-    async def message_loop(self, msg: str):
+    def message_loop(self, msg: str):
         try:
             printer = PrintStyle(italic=True, font_color="#b3ffd9", padding=False)    
             user_message = files.read_file("./prompts/fw.user_message.md", message=msg)
             self.append_message(user_message, human=True) # Append the user's input to the history                        
-            memories = await self.fetch_memories(True)
+            memories = self.fetch_memories(True)
                 
             while True: # let the agent iterate on his thoughts until he stops by using a tool
                 Agent.streaming_agent = self #mark self as current streamer
@@ -81,7 +81,7 @@ class Agent:
 
                 try:
                     system = self.system_prompt + "\n\n" + self.tools_prompt
-                    memories = await self.fetch_memories()
+                    memories = self.fetch_memories()
                     if memories: system+= "\n\n"+memories
 
                     prompt = ChatPromptTemplate.from_messages([
@@ -93,13 +93,13 @@ class Agent:
 
                     formatted_inputs = prompt.format(messages=self.history)
                     tokens = int(len(formatted_inputs)/4)     
-                    await self.rate_limiter.limit_call_and_input(tokens)
+                    self.rate_limiter.limit_call_and_input(tokens)
                     
                     # output that the agent is starting
                     PrintStyle(bold=True, font_color="green", padding=True, background_color="white").print(f"{self.agent_name}: Starting a message:")
                                             
-                    async for chunk in chain.astream(inputs):
-                        if await self.handle_intervention(agent_response): break # wait for intervention and handle it, if paused
+                    for chunk in chain.stream(inputs):
+                        if self.handle_intervention(agent_response): break # wait for intervention and handle it, if paused
 
                         if isinstance(chunk, str): content = chunk
                         elif hasattr(chunk, "content"): content = str(chunk.content)
@@ -109,7 +109,7 @@ class Agent:
                             printer.stream(content) # output the agent response stream                
                             agent_response += content # concatenate stream into the response
 
-                    await self.rate_limiter.set_output_tokens(int(len(agent_response)/4))
+                    self.rate_limiter.set_output_tokens(int(len(agent_response)/4))
                     
                     if not await self.handle_intervention(agent_response):
                         if self.last_message == agent_response: #if assistant_response is the same as last message in history, let him know
@@ -273,7 +273,7 @@ class Agent:
 
         return tool_class(agent=self, name=name, args=args, message=message, **kwargs)
 
-    async def fetch_memories(self,reset_skip=False):
+    def fetch_memories(self,reset_skip=False):
         if self.config.auto_memory_count<=0: return ""
         if reset_skip: self.memory_skip_counter = 0
 
