@@ -238,7 +238,7 @@ class Agent:
             tool_name = tool_request.get("tool_name", "")
             tool_args = tool_request.get("tool_args", {})
 
-            tool = self.get_tool(
+            tool = await self.get_tool(
                         tool_name,
                         tool_args,
                         msg)
@@ -257,7 +257,7 @@ class Agent:
             PrintStyle(font_color="red", padding=True).print(msg)
 
 
-    def get_tool(self, name: str, args: dict, message: str, **kwargs):
+    async def get_tool(self, name: str, args: dict, message: str, **kwargs):
         from python.tools.unknown import Unknown 
         from python.helpers.tool import Tool
         
