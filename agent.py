@@ -284,7 +284,7 @@ class Agent:
             self.memory_skip_counter = self.config.auto_memory_skip
             from python.tools import memory_tool
             messages = self.concat_messages(self.history)
-            memories = await memory_tool.search(self,messages)
+            memories = await memory_tool.search(self, messages)
             input = {
                 "conversation_history" : messages,
                 "raw_memories": memories
