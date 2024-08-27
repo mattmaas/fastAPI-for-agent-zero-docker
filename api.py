@@ -85,7 +85,7 @@ async def run_agent_task(agent_id: str, prompt: str, timeout: int):
         agent.append_message(prompt, human=True)
         
         try:
-            response = await asyncio.wait_for(agent.message_loop(prompt), timeout=timeout)
+            response = await asyncio.wait_for(asyncio.to_thread(agent.message_loop, prompt), timeout=timeout)
         except asyncio.TimeoutError:
             response = f"Agent task timed out after {timeout} seconds."
         
@@ -108,7 +108,7 @@ async def run_agent(request: AgentRequest):
         agent.append_message(request.prompt, human=True)
         
         try:
-            response = await asyncio.wait_for(agent.message_loop(request.prompt), timeout=timeout)
+            response = await asyncio.wait_for(asyncio.to_thread(agent.message_loop, request.prompt), timeout=timeout)
         except asyncio.TimeoutError:
             response = f"Agent task timed out after {timeout} seconds."
         
