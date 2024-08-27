@@ -53,8 +53,10 @@ class Memory(Tool):
 async def search(agent:Agent, query:str, count:int=5, threshold:float=0.1):
     initialize(agent)
     docs = db.search_similarity_threshold(query,count,threshold) # type: ignore
-    if len(docs)==0: return files.read_file("./prompts/fw.memories_not_found.md", query=query)
-    else: return str(docs)
+    if len(docs)==0: 
+        return files.read_file("./prompts/fw.memories_not_found.md", query=query)
+    else: 
+        return str(docs)
 
 def save(agent:Agent, text:str):
     initialize(agent)
