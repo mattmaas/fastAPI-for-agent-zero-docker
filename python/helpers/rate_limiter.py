@@ -51,14 +51,14 @@ class RateLimiter:
                 time.sleep(wait_time)
             current_time = time.time()
 
-    def limit_call_and_input(self, input_token_count: int) -> CallRecord:
+    async def limit_call_and_input(self, input_token_count: int) -> CallRecord:
         current_time = time.time()
         self._wait_if_needed(current_time, input_token_count)
         new_record = CallRecord(current_time, input_token_count)
         self.call_records.append(new_record)
         return new_record
 
-    def set_output_tokens(self, output_token_count: int):
+    async def set_output_tokens(self, output_token_count: int):
         if self.call_records:
             self.call_records[-1].output_tokens += output_token_count
         return self
