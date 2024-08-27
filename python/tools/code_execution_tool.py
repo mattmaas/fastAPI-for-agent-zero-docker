@@ -9,7 +9,6 @@ from python.helpers.tool import Tool, Response
 from python.helpers import files
 from python.helpers.print_style import PrintStyle
 from python.helpers.shell_local import LocalInteractiveSession
-from python.helpers.shell_ssh import SSHInteractiveSession
 
 @dataclass
 class State:
@@ -44,11 +43,7 @@ class CodeExecution(Tool):
     def prepare_state(self):
         self.state = self.agent.get_data("cot_state")
         if not self.state:
-            if self.agent.config.code_exec_ssh_enabled:
-                shell = SSHInteractiveSession(self.agent.config.code_exec_ssh_addr,self.agent.config.code_exec_ssh_port,self.agent.config.code_exec_ssh_user,self.agent.config.code_exec_ssh_pass)
-            else:
-                shell = LocalInteractiveSession()
-            
+            shell = LocalInteractiveSession()
             self.state = State(shell=shell)
             shell.connect()
         self.agent.set_data("cot_state", self.state)
