@@ -67,12 +67,12 @@ class Agent:
         os.chdir(files.get_abs_path("./work_dir")) #change CWD to work_dir
         
 
-    def message_loop(self, msg: str):
+    async def message_loop(self, msg: str):
         try:
             printer = PrintStyle(italic=True, font_color="#b3ffd9", padding=False)    
             user_message = files.read_file("./prompts/fw.user_message.md", message=msg)
             self.append_message(user_message, human=True) # Append the user's input to the history                        
-            memories = self.fetch_memories(True)
+            memories = await self.fetch_memories(True)
                 
             while True: # let the agent iterate on his thoughts until he stops by using a tool
                 Agent.streaming_agent = self #mark self as current streamer
@@ -81,7 +81,7 @@ class Agent:
 
                 try:
                     system = self.system_prompt + "\n\n" + self.tools_prompt
-                    memories = self.fetch_memories()
+                    memories = await self.fetch_memories()
                     if memories: system+= "\n\n"+memories
 
                     prompt = ChatPromptTemplate.from_messages([
@@ -93,13 +93,13 @@ class Agent:
 
                     formatted_inputs = prompt.format(messages=self.history)
                     tokens = int(len(formatted_inputs)/4)     
-                    self.rate_limiter.limit_call_and_input(tokens)
+                    await self.rate_limiter.limit_call_and_input(tokens)
                     
                     # output that the agent is starting
                     PrintStyle(bold=True, font_color="green", padding=True, background_color="white").print(f"{self.agent_name}: Starting a message:")
                                             
-                    for chunk in chain.stream(inputs):
-                        if self.handle_intervention(agent_response): break # wait for intervention and handle it, if paused
+                    async for chunk in chain.astream(inputs):
+                        if await self.handle_intervention(agent_response): break # wait for intervention and handle it, if paused
 
                         if isinstance(chunk, str): content = chunk
                         elif hasattr(chunk, "content"): content = str(chunk.content)
@@ -109,9 +109,9 @@ class Agent:
                             printer.stream(content) # output the agent response stream                
                             agent_response += content # concatenate stream into the response
 
-                    self.rate_limiter.set_output_tokens(int(len(agent_response)/4))
+                    await self.rate_limiter.set_output_tokens(int(len(agent_response)/4))
                     
-                    if not self.handle_intervention(agent_response):
+                    if not await self.handle_intervention(agent_response):
                         if self.last_message == agent_response: #if assistant_response is the same as last message in history, let him know
                             self.append_message(agent_response) # Append the assistant's response to the history
                             warning_msg = files.read_file("./prompts/fw.msg_repeat.md")
@@ -120,7 +120,7 @@ class Agent:
 
                         else: #otherwise proceed with tool
                             self.append_message(agent_response) # Append the assistant's response to the history
-                            tools_result = self.process_tools(agent_response) # process tools requested in agent message
+                            tools_result = await self.process_tools(agent_response) # process tools requested in agent message
                             if tools_result: return tools_result #break the execution if the task is done
 
                 # Forward errors to the LLM, maybe he can fix them
@@ -220,8 +220,8 @@ class Agent:
 
         return self.history
 
-    def handle_intervention(self, progress:str="") -> bool:
-        while self.paused: time.sleep(0.1) # wait if paused
+    async def handle_intervention(self, progress:str="") -> bool:
+        while self.paused: await asyncio.sleep(0.1) # wait if paused
         if self.intervention_message and not self.intervention_status: # if there is an intervention message, but not yet processed
             if progress.strip(): self.append_message(progress) # append the response generated so far
             user_msg = files.read_file("./prompts/fw.intervention.md", user_message=self.intervention_message) # format the user intervention template
@@ -230,7 +230,7 @@ class Agent:
             self.intervention_status = True
         return self.intervention_status # return intervention status
 
-    def process_tools(self, msg: str):
+    async def process_tools(self, msg: str):
         # search for tool usage requests in agent message
         tool_request = extract_tools.json_parse_dirty(msg)
 
@@ -243,13 +243,13 @@ class Agent:
                         tool_args,
                         msg)
                 
-            if self.handle_intervention(): return # wait if paused and handle intervention message if needed
+            if await self.handle_intervention(): return # wait if paused and handle intervention message if needed
             tool.before_execution(**tool_args)
-            if self.handle_intervention(): return # wait if paused and handle intervention message if needed
-            response = tool.execute(**tool_args)
-            if self.handle_intervention(): return # wait if paused and handle intervention message if needed
+            if await self.handle_intervention(): return # wait if paused and handle intervention message if needed
+            response = await tool.execute(**tool_args)
+            if await self.handle_intervention(): return # wait if paused and handle intervention message if needed
             tool.after_execution(response)
-            if self.handle_intervention(): return # wait if paused and handle intervention message if needed
+            if await self.handle_intervention(): return # wait if paused and handle intervention message if needed
             if response.break_loop: return response.message
         else:
             msg = files.read_file("prompts/fw.msg_misformat.md")
@@ -273,7 +273,7 @@ class Agent:
 
         return tool_class(agent=self, name=name, args=args, message=message, **kwargs)
 
-    def fetch_memories(self,reset_skip=False):
+    async def fetch_memories(self,reset_skip=False):
         if self.config.auto_memory_count<=0: return ""
         if reset_skip: self.memory_skip_counter = 0
 
@@ -284,13 +284,13 @@ class Agent:
             self.memory_skip_counter = self.config.auto_memory_skip
             from python.tools import memory_tool
             messages = self.concat_messages(self.history)
-            memories = memory_tool.search(self,messages)
+            memories = await memory_tool.search(self,messages)
             input = {
                 "conversation_history" : messages,
                 "raw_memories": memories
             }
             cleanup_prompt = files.read_file("./prompts/msg.memory_cleanup.md").replace("{", "{{")       
-            clean_memories = self.send_adhoc_message(cleanup_prompt,json.dumps(input), output_label="Memory injection")
+            clean_memories = await self.send_adhoc_message(cleanup_prompt,json.dumps(input), output_label="Memory injection")
             return clean_memories
 
     def call_extension(self, name: str, **kwargs) -> Any:
