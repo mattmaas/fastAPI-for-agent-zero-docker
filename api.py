@@ -146,7 +146,7 @@ async def recall(request: RecallRequest):
         agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
         tool = memory_tool.Memory(agent=agent, name="memory", args={}, message="")
         result = await tool.execute(query=request.prompt, count=request.count, threshold=request.threshold)
-        memories = await result.message  # Await the coroutine here
+        memories = result.message  # Remove the await here
         return {"result": memories}
     except Exception as e:
         logging.error(f"Error in recall endpoint: {str(e)}")
