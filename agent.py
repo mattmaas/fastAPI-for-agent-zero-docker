@@ -221,8 +221,8 @@ class Agent:
 
         return self.history
 
-    def handle_intervention(self, progress:str="") -> bool:
-        while self.paused: time.sleep(0.1) # wait if paused
+    async def handle_intervention(self, progress:str="") -> bool:
+        while self.paused: await asyncio.sleep(0.1) # wait if paused
         if self.intervention_message and not self.intervention_status: # if there is an intervention message, but not yet processed
             if progress.strip(): self.append_message(progress) # append the response generated so far
             user_msg = files.read_file("./prompts/fw.intervention.md", user_message=self.intervention_message) # format the user intervention template
@@ -231,7 +231,7 @@ class Agent:
             self.intervention_status = True
         return self.intervention_status # return intervention status
 
-    def process_tools(self, msg: str):
+    async def process_tools(self, msg: str):
         # search for tool usage requests in agent message
         tool_request = extract_tools.json_parse_dirty(msg)
 
@@ -244,13 +244,13 @@ class Agent:
                         tool_args,
                         msg)
                 
-            if self.handle_intervention(): return # wait if paused and handle intervention message if needed
-            tool.before_execution(**tool_args)
-            if self.handle_intervention(): return # wait if paused and handle intervention message if needed
-            response = tool.execute(**tool_args)
-            if self.handle_intervention(): return # wait if paused and handle intervention message if needed
-            tool.after_execution(response)
-            if self.handle_intervention(): return # wait if paused and handle intervention message if needed
+            if await self.handle_intervention(): return # wait if paused and handle intervention message if needed
+            await tool.before_execution(**tool_args)
+            if await self.handle_intervention(): return # wait if paused and handle intervention message if needed
+            response = await tool.execute(**tool_args)
+            if await self.handle_intervention(): return # wait if paused and handle intervention message if needed
+            await tool.after_execution(response)
+            if await self.handle_intervention(): return # wait if paused and handle intervention message if needed
             if response.break_loop: return response.message
         else:
             msg = files.read_file("prompts/fw.msg_misformat.md")
@@ -274,7 +274,7 @@ class Agent:
 
         return tool_class(agent=self, name=name, args=args, message=message, **kwargs)
 
-    def fetch_memories(self,reset_skip=False):
+    async def fetch_memories(self,reset_skip=False):
         if self.config.auto_memory_count<=0: return ""
         if reset_skip: self.memory_skip_counter = 0
 
