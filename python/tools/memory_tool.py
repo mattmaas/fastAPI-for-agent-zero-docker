@@ -19,13 +19,13 @@ class Memory(Tool):
     async def execute(self, **kwargs):
         logger.debug(f"Memory.execute called with kwargs: {kwargs}")
         result = ""
-        
+    
         try:
             if "query" in kwargs:
                 threshold = float(kwargs.get("threshold", 0.1))
                 count = int(kwargs.get("count", 5))
                 logger.debug(f"Executing search with query: {kwargs['query']}, count: {count}, threshold: {threshold}")
-                result = search(self.agent, kwargs["query"], count, threshold)
+                result = await search(self.agent, kwargs["query"], count, threshold)
             elif "memorize" in kwargs:
                 logger.debug(f"Executing save with text: {kwargs['memorize']}")
                 result = save(self.agent, kwargs["memorize"])
@@ -46,7 +46,7 @@ class Memory(Tool):
         except Exception as e:
             logger.error(f"Unexpected error in Memory.execute: {str(e)}")
             return Response(message=f"An error occurred: {str(e)}", break_loop=False)
-        
+    
         logger.debug(f"Memory.execute returning result: {result}")
         return Response(message=result, break_loop=False)
             
