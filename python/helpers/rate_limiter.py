@@ -10,12 +10,15 @@ class CallRecord:
     input_tokens: int
     output_tokens: int = 0  # Default to 0, will be set separately
 
+import asyncio
+
 class RateLimiter:
     def __init__(self, max_calls: int, max_input_tokens: int, max_output_tokens: int, window_seconds: int = 60):
         self.max_calls = max_calls
         self.max_input_tokens = max_input_tokens
         self.max_output_tokens = max_output_tokens
         self.window_seconds = window_seconds
+        self.lock = asyncio.Lock()
         self.call_records: deque = deque()
 
     def _clean_old_records(self, current_time: float):
