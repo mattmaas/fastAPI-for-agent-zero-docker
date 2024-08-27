@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-import os, json, contextlib, subprocess, ast, shlex
+import os, json, contextlib, subprocess, ast, shlex, asyncio
 from io import StringIO
 import time
 from typing import Literal
@@ -48,10 +48,10 @@ class CodeExecution(Tool):
             shell.connect()
         self.agent.set_data("cot_state", self.state)
     
-    def execute_python_code(self, code):
+    async def execute_python_code(self, code):
         escaped_code = shlex.quote(code)
         command = f'python3 -c {escaped_code}'
-        return self.terminal_session(command)
+        return await self.terminal_session(command)
 
     def execute_nodejs_code(self, code):
         escaped_code = shlex.quote(code)
@@ -61,21 +61,21 @@ class CodeExecution(Tool):
     def execute_terminal_command(self, command):
         return self.terminal_session(command)
 
-    def terminal_session(self, command):
-        if self.agent.handle_intervention(): return ""  # wait for intervention and handle it, if paused
+    async def terminal_session(self, command):
+        if await self.agent.handle_intervention(): return ""  # wait for intervention and handle it, if paused
        
         self.state.shell.send_command(command)
 
         PrintStyle(background_color="white",font_color="#1B4F72",bold=True).print(f"{self.agent.agent_name} code execution output:")
-        return self.get_terminal_output()
+        return await self.get_terminal_output()
 
-    def get_terminal_output(self):
+    async def get_terminal_output(self):
         idle=0
         while True:       
-            time.sleep(0.1)  # Wait for some output to be generated
+            await asyncio.sleep(0.1)  # Wait for some output to be generated
             full_output, partial_output = self.state.shell.read_output()
 
-            if self.agent.handle_intervention(): return full_output  # wait for intervention and handle it, if paused
+            if await self.agent.handle_intervention(): return full_output  # wait for intervention and handle it, if paused
         
             if partial_output:
                 PrintStyle(font_color="#85C1E9").stream(partial_output)
