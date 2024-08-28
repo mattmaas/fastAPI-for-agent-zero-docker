@@ -31,7 +31,7 @@ class Memory(Tool):
                 result = save(self.agent, kwargs["memorize"])
             elif "forget" in kwargs:
                 logger.debug(f"Executing forget with query: {kwargs['forget']}")
-                result = forget(self.agent, kwargs["forget"])
+                result = await forget(self.agent, kwargs["forget"])
             elif "delete" in kwargs:
                 logger.debug(f"Executing delete with ids: {kwargs['delete']}")
                 result = delete(self.agent, kwargs["delete"])
@@ -53,7 +53,7 @@ class Memory(Tool):
 async def search(agent:Agent, query:str, count:int=5, threshold:float=0.1):
     initialize(agent)
     docs = await db.search_similarity_threshold(query,count,threshold) # type: ignore
-    if len(docs)==0: 
+    if not docs:  # Check if docs is empty (None or empty list)
         return files.read_file("./prompts/fw.memories_not_found.md", query=query)
     else: 
         return str(docs)
@@ -69,9 +69,9 @@ def delete(agent:Agent, ids_str:str):
     deleted = db.delete_documents_by_ids(ids) # type: ignore
     return files.read_file("./prompts/fw.memories_deleted.md", memory_count=deleted)    
 
-def forget(agent:Agent, query:str):
+async def forget(agent:Agent, query:str):
     initialize(agent)
-    deleted = db.delete_documents_by_query(query) # type: ignore
+    deleted = await db.delete_documents_by_query(query) # type: ignore
     return files.read_file("./prompts/fw.memories_deleted.md", memory_count=deleted)
 
 def initialize(agent:Agent):
