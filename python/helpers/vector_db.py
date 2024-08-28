@@ -41,23 +41,19 @@ class VectorDB:
     def search_max_rel(self, query, results=3):
         return self.db.max_marginal_relevance_search(query,results)
 
-    def delete_documents_by_query(self, query:str, threshold=0.1):
+    async def delete_documents_by_query(self, query:str, threshold=0.1):
         k = 100
         tot = 0
         while True:
             # Perform similarity search with score
-            docs = self.search_similarity_threshold(query, results=k, threshold=threshold)
+            docs = await self.search_similarity_threshold(query, results=k, threshold=threshold)
 
             # Extract document IDs and filter based on score
-            # document_ids = [result[0].metadata["id"] for result in docs if result[1] < score_limit]
             document_ids = [result.metadata["id"] for result in docs]
             
 
             # Delete documents with IDs over the threshold score
             if document_ids:
-                # fnd = self.db.get(where={"id": {"$in": document_ids}})
-                # if fnd["ids"]: self.db.delete(ids=fnd["ids"])
-                # tot += len(fnd["ids"])
                 self.db.delete(ids=document_ids)
                 tot += len(document_ids)
                                     
