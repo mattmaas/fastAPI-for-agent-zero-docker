@@ -63,16 +63,16 @@ class VectorDB:
         
         return tot
 
-    def delete_documents_by_ids(self, ids:list[str]):
+    async def delete_documents_by_ids(self, ids:list[str]):
         # pre = self.db.get(ids=ids)["ids"]
-        self.db.delete(ids=ids)
+        await self.db.adelete(ids=ids)
         # post = self.db.get(ids=ids)["ids"]
         #TODO? compare pre and post
         return len(ids)
         
-    def insert_document(self, data):
+    async def insert_document(self, data):
         id = str(uuid.uuid4())
-        self.db.add_documents(documents=[ Document(data, metadata={"id": id}) ], ids=[id])
+        await self.db.aadd_documents(documents=[ Document(data, metadata={"id": id}) ], ids=[id])
         
         return id
         

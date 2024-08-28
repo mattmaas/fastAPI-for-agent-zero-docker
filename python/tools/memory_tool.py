@@ -28,13 +28,13 @@ class Memory(Tool):
                 result = await search(self.agent, kwargs["query"], count, threshold)
             elif "memorize" in kwargs:
                 logger.debug(f"Executing save with text: {kwargs['memorize']}")
-                result = save(self.agent, kwargs["memorize"])
+                result = await save(self.agent, kwargs["memorize"])
             elif "forget" in kwargs:
                 logger.debug(f"Executing forget with query: {kwargs['forget']}")
                 result = await forget(self.agent, kwargs["forget"])
             elif "delete" in kwargs:
                 logger.debug(f"Executing delete with ids: {kwargs['delete']}")
-                result = delete(self.agent, kwargs["delete"])
+                result = await delete(self.agent, kwargs["delete"])
             else:
                 logger.warning("No recognized operation in kwargs")
                 return Response(message="No recognized operation", break_loop=False)
@@ -58,15 +58,15 @@ async def search(agent:Agent, query:str, count:int=5, threshold:float=0.1):
     else: 
         return str(docs)
 
-def save(agent:Agent, text:str):
+async def save(agent:Agent, text:str):
     initialize(agent)
-    id = db.insert_document(text) # type: ignore
+    id = await db.insert_document(text) # type: ignore
     return files.read_file("./prompts/fw.memory_saved.md", memory_id=id)
 
-def delete(agent:Agent, ids_str:str):
+async def delete(agent:Agent, ids_str:str):
     initialize(agent)
     ids = extract_guids(ids_str)
-    deleted = db.delete_documents_by_ids(ids) # type: ignore
+    deleted = await db.delete_documents_by_ids(ids) # type: ignore
     return files.read_file("./prompts/fw.memories_deleted.md", memory_count=deleted)    
 
 async def forget(agent:Agent, query:str):
