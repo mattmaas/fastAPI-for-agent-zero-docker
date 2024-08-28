@@ -54,7 +54,7 @@ class VectorDB:
 
             # Delete documents with IDs over the threshold score
             if document_ids:
-                self.db.delete(ids=document_ids)
+                await self.db.adelete(ids=document_ids)
                 tot += len(document_ids)
                                     
             # If fewer than K document IDs, break the loop
