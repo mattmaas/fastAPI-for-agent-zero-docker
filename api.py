@@ -8,8 +8,12 @@ import logging
 import asyncio
 import uuid
 from python.tools import memory_tool, knowledge_tool, online_knowledge_tool
+from python.helpers import files
 
 load_dotenv()
+
+# Set the working directory
+os.chdir(files.get_abs_path("./work_dir"))
 
 # Configure logging
 logging.basicConfig(level=logging.ERROR, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -29,6 +33,8 @@ config = AgentConfig(
     utility_model=utility_model,
     embeddings_model=embedding_model,
     response_timeout_seconds=180,  # 3 minutes for individual agent response
+    code_exec_docker_volumes={files.get_abs_path("work_dir"): {"bind": "/root", "mode": "rw"}},
+    # Add other necessary configurations here
 )
 
 agents = {}
