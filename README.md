@@ -1,3 +1,15 @@
+## Fork Overview
+
+This fork adds an asynchronous FastAPI to the Agent Zero framework and also includes a Dockerfile for to easily run the original projecct in a self contained container. Key changes include:
+
+- **FastAPI Integration**: The application now uses FastAPI to expose its functionalities as RESTful endpoints, allowing for easy interaction and integration with other services.
+- **Asynchronous Enhancements**: Many operations have been refactored to be asynchronous, improving the responsiveness and scalability of the application.
+- **Agent Execution Methods**: Two methods for running agents are provided:
+  - `run_agent`: Executes an agent synchronously, blocking until the task is complete.
+  - `run_agent_async`: Initiates an agent task asynchronously, allowing other operations to continue while the agent works.
+- **Dockerization**: The application is designed to run inside a Docker container, making it easy to deploy as a microservice. The Dockerfile has been updated to reflect these changes.
+- **Note on Docker**: Regular Dockerization features have been disabled in the code since the entire application is intended to run within a Docker container.
+
 # Agent Zero
 
 [![Join our Skool Community](https://img.shields.io/badge/Skool-Join%20our%20Community-4A90E2?style=for-the-badge&logo=skool&logoColor=white)](https://www.skool.com/agent-zero) [![Join our Discord](https://img.shields.io/badge/Discord-Join%20our%20server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/B8KZKNsPpj) [![Subscribe on YouTube](https://img.shields.io/badge/YouTube-Subscribe-red?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@AgentZeroFW) [![Connect on LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/jan-tomasek/) [![Follow on X.com](https://img.shields.io/badge/X.com-Follow-1DA1F2?style=for-the-badge&logo=x&logoColor=white)](https://x.com/JanTomasekDev)
