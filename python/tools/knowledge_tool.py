@@ -56,11 +56,6 @@ class Knowledge(Tool):
             await memory_tool.save(self.agent, f"Perplexica Search Answer for '{prompt}': {perplexica_result['message']}")
 
             # Save full contents of Perplexica sources to memory
-            for source in perplexica_result['sources']:
-                url = source['metadata'].get('url', '')
-                full_text = self.fetch_full_content(url)
-                source_content = f"Perplexica Source: {source['metadata'].get('title', 'Unknown')}\nURL: {url}\nContent: {full_text}"
-                await memory_tool.save(self.agent, source_content)
 
             # Save Perplexity result to memory
             await memory_tool.save(self.agent, f"Perplexity Search Answer for '{prompt}': {perplexity_result['answer']}")
@@ -88,7 +83,7 @@ class Knowledge(Tool):
 
     async def perform_perplexica_search(self, query, focus_mode):
         try:
-            perplexica_url = os.getenv('PERPLEXICA_URL', 'http://host.docker.internal:3001')
+            perplexica_url = os.getenv('PERPLEXICA_URL', 'http://100.108.162.61:3001')
             url = f"{perplexica_url}/api/search"
             data = {
                 "chatModel": {
@@ -112,9 +107,6 @@ class Knowledge(Tool):
             result = response.json()
             
             # Save Perplexica sources to memory
-            for source in result['sources']:
-                source_content = f"Perplexica Source: {source['metadata'].get('title', 'Unknown')}\nURL: {source['metadata'].get('url', 'N/A')}\nSnippet: {source['pageContent']}"
-                await memory_tool.save(self.agent, source_content)
 
             return result
 
