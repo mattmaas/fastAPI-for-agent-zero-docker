@@ -11,7 +11,7 @@ class OnlineKnowledge(Tool):
         
         # Log the full research results
         work_dir = self.agent.get_data("work_dir") or os.getcwd()
-        research_logger.log_research(prompt=self.args["prompt"], sources=perplexity_result["sources"], work_dir=work_dir)
+        research_logger.log_research(prompt=self.args["prompt"], answer=perplexity_result["answer"], work_dir=work_dir)
         
         # Prepare the response for the agent
         response = f"Perplexity Answer: {perplexity_result['answer']}\n"
