@@ -65,10 +65,8 @@ async def perplexity_search(query: str, agent=None, model_name="llama-3.1-sonar-
             else:
                 logging.error("Max retries exceeded. Raising exception.")
                 raise
-```
 
 python/helpers/knowledge_search.py
-```python
 <<<<< SEARCH
 async def perform_perplexica_search(self, query, focus_mode):
     try:
