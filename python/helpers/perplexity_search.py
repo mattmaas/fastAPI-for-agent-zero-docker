@@ -9,13 +9,10 @@ import models
 import os
 import logging
 import requests
-from bs4 import BeautifulSoup
 from python.tools import memory_tool
-from openai import OpenAI
 import models
-import time
 
-async def perplexity_search(query: str, agent=None, model_name="llama-3.1-sonar-large-128k-online", base_url="https://api.perplexity.ai") -> dict:
+async def perplexity_search(query: str, agent=None) -> dict:
     logging.info(f"Perplexity search called with query: {query}")
     
     api_key = os.getenv("API_KEY_PERPLEXITY") or models.get_api_key("perplexity")
@@ -24,47 +21,55 @@ async def perplexity_search(query: str, agent=None, model_name="llama-3.1-sonar-
 
     logging.info(f"Using API key: {api_key[:5]}...{api_key[-5:]}")  # Log part of the API key for debugging
 
-    client = OpenAI(api_key=api_key, base_url=base_url)
-    
-    messages = [
-        {
-            "role": "system",
-            "content": "Be thorough in your answer and provide as much relevant information as possible."
-        },
-        {
-            "role": "user",
-            "content": query
-        },
-    ]
-    
-    logging.info(f"Prepared messages: {messages}")
-    
-    retries = 3
-    for attempt in range(retries):
-        try:
-            logging.info(f"Sending request to Perplexity API (Attempt {attempt + 1})")
-            response = client.chat.completions.create(
-                model=model_name,
-                messages=messages,
-            )
-            logging.info("Received response from Perplexity API")
-            
-            result = response.choices[0].message.content
-            # Save the answer to memory
-            if agent:
-                await memory_tool.save(agent, f"Perplexity Search Answer for '{query}': {result}")
+    url = "https://api.perplexity.ai/chat/completions"
+    payload = {
+        "model": "llama-3.1-sonar-small-128k-online",
+        "messages": [
+            {
+                "role": "system",
+                "content": "Be precise and concise."
+            },
+            {
+                "role": "user",
+                "content": query
+            }
+        ],
+        "max_tokens": "Optional",
+        "temperature": 0.2,
+        "top_p": 0.9,
+        "return_citations": True,
+        "search_domain_filter": ["perplexity.ai"],
+        "return_images": False,
+        "return_related_questions": False,
+        "search_recency_filter": "month",
+        "top_k": 0,
+        "stream": False,
+        "presence_penalty": 0,
+        "frequency_penalty": 1
+    }
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
 
-            logging.info(f"Extracted result: {result[:100]}...")  # Log first 100 characters of the result
-            return {"answer": result, "sources": []}
-        except Exception as e:
-            logging.error(f"Error in Perplexity API call on attempt {attempt + 1}: {str(e)}")
-            if attempt < retries - 1:
-                wait_time = 2 ** attempt
-                logging.info(f"Retrying in {wait_time} seconds...")
-                time.sleep(wait_time)
-            else:
-                logging.error("Max retries exceeded. Raising exception.")
-                raise
+    try:
+        logging.info("Sending request to Perplexity API")
+        response = requests.post(url, json=payload, headers=headers)
+        response.raise_for_status()
+        logging.info("Received response from Perplexity API")
+        
+        result = response.json()
+        answer = result.get('choices', [{}])[0].get('message', {}).get('content', '')
+        
+        # Save the answer to memory
+        if agent:
+            await memory_tool.save(agent, f"Perplexity Search Answer for '{query}': {answer}")
+
+        logging.info(f"Extracted result: {answer[:100]}...")  # Log first 100 characters of the result
+        return {"answer": answer, "sources": result.get('sources', [])}
+    except Exception as e:
+        logging.error(f"Error in Perplexity API call: {str(e)}")
+        raise
 
 python/helpers/knowledge_search.py
 <<<<< SEARCH
