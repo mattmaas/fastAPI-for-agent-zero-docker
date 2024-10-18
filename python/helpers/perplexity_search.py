@@ -63,12 +63,10 @@ async def perplexity_search(query: str, agent=None) -> dict:
         logging.error(f"Error in Perplexity API call: {str(e)}")
         raise
 
->>>>
 ```
 
 python/helpers/perplexity_search.py
 ```python
-<<<<< SEARCH
 async def perform_perplexica_search(self, query, focus_mode):
     try:
         perplexica_url = os.getenv('PERPLEXICA_URL', 'http://100.108.162.61:3001')
