@@ -67,7 +67,7 @@ async def perplexity_search(query: str, agent=None) -> dict:
 
 async def perform_perplexica_search(self, query, focus_mode):
     try:
-        perplexica_url = os.getenv('PERPLEXICA_URL', 'http://100.108.162.61:3001')
+        perplexica_url = os.getenv('PERPLEXICA_URL', 'http://100.108.162.61')
         url = f"{perplexica_url}/api/search"
         data = {
             "chatModel": {
