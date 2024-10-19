@@ -49,13 +49,13 @@ class Knowledge(Tool):
             memories = await memory_tool.search(self.agent, prompt)
             logger.debug(f"Fetched memories. Count: {len(memories)}")
 
+            # Generate unique filename based on timestamp and query
+            sanitized_query = sanitize_filename(prompt)[:100]
+            filename = f"{self.timestamp}_{sanitized_query}.txt"
             research_file_path = os.path.join(work_dir, filename)
 
             # Prepare the research document
             research_document = self.prepare_research_document(perplexity_result, perplexica_result['sources'], perplexica_result['message'], memories, research_file_path)
-            sanitized_query = sanitize_filename(prompt)[:100]
-            filename = f"{self.timestamp}_{sanitized_query}.txt"
-            research_file_path = os.path.join(work_dir, filename)
 
             # Save the research document
             with open(research_file_path, "w", encoding="utf-8") as f:
