@@ -83,8 +83,8 @@ class Knowledge(Tool):
 
     async def perform_perplexica_search(self, query, focus_mode):
         try:
-            perplexica_url = os.getenv('PERPLEXICA_URL', 'http://100.108.162.61:3001')
-            url = f"{perplexica_url}/api/search"
+            #perplexica_url = os.getenv('PERPLEXICA_URL', 'http://100.108.162.61:3001')
+            url = f"http://localhost:3001/api/search"
             data = {
                 "chatModel": {
                     "provider": "openai",
