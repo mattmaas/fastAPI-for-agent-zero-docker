@@ -35,10 +35,10 @@ class Knowledge(Tool):
             # Perplexity search
             logger.debug("Starting Perplexity search")
             perplexity_result = await perplexity_search.perplexity_search(prompt)
-            logger.debug(f"Perplexity search completed. Answer length: {len(perplexity_result['answer'])}")
+            logger.debug(f"Perplexity search completed. Answer length: {len(perplexity_result)}")
 
             # Prepare the research document
-            research_document = self.prepare_research_document(perplexity_result['answer'], perplexica_result['sources'])
+            research_document = self.prepare_research_document(perplexity_result, perplexica_result['sources'])
 
             # Generate unique filename based on timestamp and query
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -58,12 +58,12 @@ class Knowledge(Tool):
             # Save full contents of Perplexica sources to memory
 
             # Save Perplexity result to memory
-            await memory_tool.save(self.agent, f"Perplexity Search Answer for '{prompt}': {perplexity_result['answer']}")
+            await memory_tool.save(self.agent, f"Perplexity Search Answer for '{prompt}': {perplexity_result}")
 
             # Prepare the message for the agent
             logger.debug("Preparing agent message")
             perplexica_summary = perplexica_result['message']
-            perplexity_answer = perplexity_result['answer']
+            perplexity_answer = perplexity_result
             msg = await self.prepare_agent_message(perplexity_answer, perplexica_summary, research_file_path)
             logger.debug(f"Agent message prepared. Length: {len(msg)}")
 
