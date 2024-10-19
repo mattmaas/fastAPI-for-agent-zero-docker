@@ -83,7 +83,8 @@ class Knowledge(Tool):
 
     def perform_perplexica_search(self, query, focus_mode):
         try:
-            url = "http://100.108.162.61:3001/api/search"
+            base_url = os.getenv("PERPLEXICA_API_URL", "http://100.108.162.61:3001/api")
+            url = f"{base_url}/search"
             payload = json.dumps({
               "chatModel": {
                 "provider": "openai",
@@ -110,7 +111,7 @@ class Knowledge(Tool):
             headers = {
               'Content-Type': 'application/json'
             }
-            response = requests.post(url, headers=headers, data=payload)
+            response = requests.post(url, headers=headers, data=payload, timeout=10)
             response.raise_for_status()
             logger.debug("Successfully connected to Perplexica")
 
