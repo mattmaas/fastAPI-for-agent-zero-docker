@@ -19,8 +19,10 @@ COPY ./work_dir /app/work_dir
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Load environment variables from .env file
-ENV $(cat .env | xargs)
+# Set default environment variables
+ENV PERPLEXICA_API_URL="http://localhost:3001/api/search"
+ENV API_KEY_OPENAI="your-default-openai-api-key"
+ENV API_KEY_PERPLEXITY="your-default-perplexity-api-key"
 
 # Expose the port the app runs on
 EXPOSE 8766
