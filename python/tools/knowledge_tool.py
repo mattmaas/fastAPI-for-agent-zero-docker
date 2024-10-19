@@ -144,7 +144,7 @@ class Knowledge(Tool):
         return document
 
     async def prepare_agent_message(self, perplexity_answer, perplexica_summary, research_file_path):
-        combined_result = f"Perplexity Answer:\n{perplexity_answer}\n\nPerplexica Summary:\n{perplexica_summary}"
+        combined_result = f"{perplexity_answer}\n\n{perplexica_summary}"
         return files.read_file("prompts/tool.knowledge.response.md", 
                                combined_result=combined_result,
                                research_file_path=research_file_path)
