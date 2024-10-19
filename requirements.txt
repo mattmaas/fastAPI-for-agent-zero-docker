@@ -15,3 +15,4 @@ duckduckgo_search==6.1.12
 inputimeout==1.0.4
 requests==2.31.0
 beautifulsoup4==4.12.2
+PyPDF2
