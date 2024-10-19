@@ -96,16 +96,6 @@ class Knowledge(Tool):
               "optimizationMode": "speed",
               "focusMode": focus_mode,
               "query": query,
-              "history": [
-                [
-                  "human",
-                  "Hi, how are you?"
-                ],
-                [
-                  "assistant",
-                  "I am doing well, how can I help you today?"
-                ]
-              ]
             })
             headers = {
               'Content-Type': 'application/json'
