@@ -1,5 +1,5 @@
 from agent import Agent
-from python.helpers import perplexity_search
+from python.helpers import perplexity_search, memory_tool
 from python.helpers.tool import Tool, Response
 from python.helpers import research_logger
 import asyncio

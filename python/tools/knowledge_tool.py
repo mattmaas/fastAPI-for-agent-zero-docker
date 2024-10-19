@@ -42,6 +42,10 @@ class Knowledge(Tool):
             memories = await memory_tool.search(self.agent, prompt)
             logger.debug(f"Fetched memories. Count: {len(memories)}")
 
+            # Fetch related memories
+            memories = await memory_tool.search(self.agent, prompt)
+            logger.debug(f"Fetched memories. Count: {len(memories)}")
+
             # Prepare the research document
             research_document = self.prepare_research_document(perplexity_result, perplexica_result['sources'], perplexica_result['message'], memories)
 

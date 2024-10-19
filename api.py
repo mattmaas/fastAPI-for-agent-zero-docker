@@ -205,7 +205,7 @@ async def reddit_search(request: ResearchRequest):
 async def perform_focused_search(request: ResearchRequest, focus_mode: str):
     agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
     tool = knowledge_tool.Knowledge(agent=agent, name="knowledge", args={"prompt": request.prompt, "focus_mode": focus_mode}, message="")
-    response = await tool.execute(prompt=request.prompt, focus_mode=focus_mode)
+    response = await tool.execute()
     return {"result": response.message}
 
 if __name__ == "__main__":
