@@ -129,9 +129,14 @@ class Knowledge(Tool):
             return {"message": "", "sources": []}
 
     def prepare_research_document(self, perplexity_answer, perplexica_result):
-        sources = perplexica_result['sources']
+        if isinstance(perplexica_result, dict):
+            sources = perplexica_result.get('sources', [])
+            perplexica_message = perplexica_result.get('message', '')
+        else:
+            sources = []
+            perplexica_message = ''
         document = f"Perplexity Answer:\n{perplexity_answer}\n\n"
-        document += f"Perplexica Summary:\n{perplexica_result['message']}\n\n"
+        document += f"Perplexica Summary:\n{perplexica_message}\n\n"
         document += "Research Document\n\n"
         document += "Perplexica Sources:\n"
         for source in sources:
