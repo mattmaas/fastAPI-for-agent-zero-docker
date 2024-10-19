@@ -17,7 +17,7 @@ COPY . /app
 COPY ./work_dir /app/work_dir
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Set default environment variables
 ENV PERPLEXICA_API_URL="http://localhost:3001/api/search"
