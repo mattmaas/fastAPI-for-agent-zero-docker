@@ -50,7 +50,7 @@ class Knowledge(Tool):
             logger.debug(f"Fetched memories. Count: {len(memories)}")
 
             # Prepare the research document
-            research_document = self.prepare_research_document(perplexity_result, perplexica_result['sources'], perplexica_result['message'], memories)
+            research_document = self.prepare_research_document(perplexity_result, perplexica_result['sources'], perplexica_result['message'], memories, research_file_path)
 
             # Generate unique filename based on timestamp and query
             sanitized_query = sanitize_filename(prompt)[:100]
@@ -139,7 +139,7 @@ class Knowledge(Tool):
             logger.error(f"Error in Perplexica search: {str(e)}")
             return {"message": "", "sources": []}
 
-    def prepare_research_document(self, perplexity_answer, perplexica_sources, perplexica_message, memories):
+    def prepare_research_document(self, perplexity_answer, perplexica_sources, perplexica_message, memories, research_file_path):
         sources = perplexica_sources
         document = f"Perplexity Answer:\n{perplexity_answer}\n\n"
         document += f"Perplexica Summary:\n{perplexica_message}\n\n"
