@@ -168,7 +168,7 @@ async def research(request: ResearchRequest):
     agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
     focus_mode = request.focus_mode if hasattr(request, 'focus_mode') else "webSearch"
     tool = knowledge_tool.Knowledge(agent=agent, name="knowledge", args={"prompt": request.prompt, "focus_mode": focus_mode}, message="")
-    response = await tool.execute(prompt=request.prompt, focus_mode=focus_mode)
+    response = await tool.execute()
     return {"result": response.message}
 
 class ResearchRequest(BaseModel):

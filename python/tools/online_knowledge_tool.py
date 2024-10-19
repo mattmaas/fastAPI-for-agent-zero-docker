@@ -13,8 +13,11 @@ class OnlineKnowledge(Tool):
         work_dir = self.agent.get_data("work_dir") or os.getcwd()
         research_logger.log_research(query=self.args["prompt"], answer=perplexity_result, work_dir=work_dir)
     
+        # Fetch related memories
+        memories = await memory_tool.search(self.agent, self.args["prompt"])
+
         # Prepare the response for the agent
-        response = f"Perplexity Answer: {perplexity_result}\n"
+        response = f"Perplexity Answer: {perplexity_result}\n\nRelated Memories:\n{memories}\n"
 
         return Response(
             message=response,

@@ -16,9 +16,10 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 class Knowledge(Tool):
-    async def execute(self, **kwargs):
-        prompt = kwargs.get("prompt") or self.args.get("prompt")
-        focus_mode = kwargs.get("focus_mode") or self.args.get("focus_mode") or "webSearch"
+    async def execute(self):
+        prompt = self.args.get("prompt")
+        focus_mode = self.args.get("focus_mode") or "webSearch"
+        self.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         logger.debug(f"Knowledge.execute called with prompt: {prompt}, focus_mode: {focus_mode}")
         if not prompt:
             logger.warning("No prompt provided for knowledge search")
@@ -37,13 +38,16 @@ class Knowledge(Tool):
             perplexity_result = await perplexity_search.perplexity_search(prompt)
             logger.debug(f"Perplexity search completed. Answer length: {len(perplexity_result)}")
 
+            # Fetch related memories
+            memories = await memory_tool.search(self.agent, prompt)
+            logger.debug(f"Fetched memories. Count: {len(memories)}")
+
             # Prepare the research document
-            research_document = self.prepare_research_document(perplexity_result, perplexica_result['sources'], perplexica_result['message'])
+            research_document = self.prepare_research_document(perplexity_result, perplexica_result['sources'], perplexica_result['message'], memories)
 
             # Generate unique filename based on timestamp and query
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             sanitized_query = sanitize_filename(prompt)[:100]
-            filename = f"{timestamp}_{sanitized_query}.txt"
+            filename = f"{self.timestamp}_{sanitized_query}.txt"
             research_file_path = os.path.join(work_dir, filename)
 
             # Save the research document
@@ -128,10 +132,11 @@ class Knowledge(Tool):
             logger.error(f"Error in Perplexica search: {str(e)}")
             return {"message": "", "sources": []}
 
-    def prepare_research_document(self, perplexity_answer, perplexica_sources, perplexica_message):
+    def prepare_research_document(self, perplexity_answer, perplexica_sources, perplexica_message, memories):
         sources = perplexica_sources
         document = f"Perplexity Answer:\n{perplexity_answer}\n\n"
         document += f"Perplexica Summary:\n{perplexica_message}\n\n"
+        document += f"Related Memories:\n{memories}\n\n"
         document += "Research Document\n\n"
         document += "Perplexica Sources:\n"
         for source in sources:
