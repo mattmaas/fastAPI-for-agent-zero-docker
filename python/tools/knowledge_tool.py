@@ -38,7 +38,7 @@ class Knowledge(Tool):
             logger.debug(f"Perplexity search completed. Answer length: {len(perplexity_result)}")
 
             # Prepare the research document
-            research_document = self.prepare_research_document(perplexity_result, perplexica_result['sources'])
+            research_document = self.prepare_research_document(perplexity_result, perplexica_result['sources'], perplexica_result['message'])
 
             # Generate unique filename based on timestamp and query
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -128,13 +128,8 @@ class Knowledge(Tool):
             logger.error(f"Error in Perplexica search: {str(e)}")
             return {"message": "", "sources": []}
 
-    def prepare_research_document(self, perplexity_answer, perplexica_result):
-        if isinstance(perplexica_result, dict):
-            sources = perplexica_result.get('sources', [])
-            perplexica_message = perplexica_result.get('message', '')
-        else:
-            sources = []
-            perplexica_message = ''
+    def prepare_research_document(self, perplexity_answer, perplexica_sources, perplexica_message):
+        sources = perplexica_sources
         document = f"Perplexity Answer:\n{perplexity_answer}\n\n"
         document += f"Perplexica Summary:\n{perplexica_message}\n\n"
         document += "Research Document\n\n"
