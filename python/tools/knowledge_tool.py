@@ -131,7 +131,7 @@ class Knowledge(Tool):
     def prepare_research_document(self, perplexity_answer, perplexica_result):
         sources = perplexica_result['sources']
         document = f"Perplexity Answer:\n{perplexity_answer}\n\n"
-        document += f"Perplexica Main Answer:\n{perplexica_result['message']}\n\n"
+        document += f"Perplexica Summary:\n{perplexica_result['message']}\n\n"
         document += "Research Document\n\n"
         document += "Perplexica Sources:\n"
         for source in sources:
@@ -144,7 +144,7 @@ class Knowledge(Tool):
         return document
 
     async def prepare_agent_message(self, perplexity_answer, perplexica_summary, research_file_path):
-        combined_result = f"{perplexity_answer}\n\n{perplexica_summary}"
+        combined_result = f"Perplexity Answer:\n{perplexity_answer}\n\nPerplexica Summary:\n{perplexica_summary}"
         return files.read_file("prompts/tool.knowledge.response.md", 
                                combined_result=combined_result,
                                research_file_path=research_file_path)
