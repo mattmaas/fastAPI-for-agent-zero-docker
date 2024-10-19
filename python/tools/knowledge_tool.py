@@ -148,7 +148,7 @@ class Knowledge(Tool):
         document += "Perplexica Sources:\n"
         for source in sources:
             url = source['metadata'].get('url', '')
-            full_text = self.fetch_full_content(url)
+            full_text = self.fetch_full_content(url, research_file_path)
             document += f"Title: {source['metadata'].get('title', 'N/A')}\n"
             document += f"URL: {url}\n"
             document += f"Full Content:\n{full_text}\n\n"
@@ -160,7 +160,7 @@ class Knowledge(Tool):
         return files.read_file("prompts/tool.knowledge.response.md", 
                                combined_result=combined_result,
                                research_file_path=research_file_path)
-    def fetch_full_content(self, url):
+    def fetch_full_content(self, url, research_file_path):
         try:
             if not url:
                 return "No URL provided."
