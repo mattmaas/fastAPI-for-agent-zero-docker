@@ -21,7 +21,7 @@ async def perplexity_search(query:str, model_name="llama-3.1-sonar-large-128k-on
     
     try:
         logging.info("Sending request to Perplexity API")
-        response = await client.chat.completions.create(
+        response = client.chat.completions.create(
             model=model_name,
             messages=messages,
         )
