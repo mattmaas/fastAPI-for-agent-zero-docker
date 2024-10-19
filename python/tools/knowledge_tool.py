@@ -122,7 +122,7 @@ class Knowledge(Tool):
             headers = {
               'Content-Type': 'application/json'
             }
-            response = requests.post(url, headers=headers, data=payload, timeout=10)
+            response = requests.post(url, headers=headers, data=payload, timeout=45)
             response.raise_for_status()
             logger.debug("Successfully connected to Perplexica")
 
