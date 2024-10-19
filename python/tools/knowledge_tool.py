@@ -83,7 +83,7 @@ class Knowledge(Tool):
 
     def perform_perplexica_search(self, query, focus_mode):
         try:
-            base_url = os.getenv("PERPLEXICA_API_URL", "http://100.108.162.61:3001/api")
+            base_url = os.getenv("PERPLEXICA_API_URL", "http://localhost:3001/api")
             url = f"{base_url}/search"
             payload = json.dumps({
               "chatModel": {
