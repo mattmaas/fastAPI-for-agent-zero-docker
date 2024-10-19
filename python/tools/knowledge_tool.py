@@ -115,10 +115,13 @@ class Knowledge(Tool):
             logger.debug("Successfully connected to Perplexica")
 
             result = response.json()
-            
-            # Save Perplexica sources to memory
+            message = result.get("message", "")
+            sources = result.get("sources", [])
 
-            return result
+            logger.debug(f"Perplexica message: {message[:100]}...")  # Log first 100 characters of the message
+            logger.debug(f"Number of sources: {len(sources)}")
+
+            return {"message": message, "sources": sources}
 
         except Exception as e:
             logger.error(f"Error in Perplexica search: {str(e)}")
