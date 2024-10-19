@@ -83,24 +83,34 @@ class Knowledge(Tool):
 
     async def perform_perplexica_search(self, query, focus_mode):
         try:
-            #perplexica_url = os.getenv('PERPLEXICA_URL', 'http://100.108.162.61:3001')
-            url = f"http://localhost:3001/api/search"
-            data = {
-                "chatModel": {
-                    "provider": "openai",
-                    "model": "gpt-4"
-                },
-                "embeddingModel": {
-                    "provider": "openai",
-                    "model": "text-embedding-3-large"
-                },
-                "optimizationMode": "balanced",
-                "focusMode": focus_mode,
-                "query": query
+            url = "http://100.108.162.61:3001/api/search"
+            payload = json.dumps({
+              "chatModel": {
+                "provider": "openai",
+                "model": "gpt-4o"
+              },
+              "embeddingModel": {
+                "provider": "openai",
+                "model": "text-embedding-3-large"
+              },
+              "optimizationMode": "speed",
+              "focusMode": focus_mode,
+              "query": query,
+              "history": [
+                [
+                  "human",
+                  "Hi, how are you?"
+                ],
+                [
+                  "assistant",
+                  "I am doing well, how can I help you today?"
+                ]
+              ]
+            })
+            headers = {
+              'Content-Type': 'application/json'
             }
-            logger.debug(f"Attempting to connect to Perplexica at: {url}")
-            logger.debug(f"With data: {data}")
-            response = requests.post(url, json=data, timeout=180)
+            response = requests.request("POST", url, headers=headers, data=payload)
             response.raise_for_status()
             logger.debug("Successfully connected to Perplexica")
 
