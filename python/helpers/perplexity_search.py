@@ -21,7 +21,7 @@ async def perplexity_search(query: str, agent=None) -> dict:
         "messages": [
             {
                 "role": "system",
-                "content": "Be precise and concise."
+                "content": "Be thorough and detailed."
             },
             {
                 "role": "user",
@@ -53,7 +53,7 @@ async def perplexity_search(query: str, agent=None) -> dict:
         logging.info("Received response from Perplexity API")
         
         result = response.json()
-        answer = result.get('choices', [{}])[0].get('message', {}).get('content', '')
+        answer = result.get('choices', [{}])[0].get('message', {}).get('content', 'No answer found.')
         
         # Save the answer to memory
         if agent:
