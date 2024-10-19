@@ -29,7 +29,7 @@ class Knowledge(Tool):
 
             # Perplexica search
             logger.debug("Starting Perplexica search")
-            perplexica_result = await self.perform_perplexica_search(prompt, focus_mode)
+            perplexica_result = self.perform_perplexica_search(prompt, focus_mode)
             logger.debug(f"Perplexica search completed. Result length: {len(perplexica_result['message'])}")
 
             # Perplexity search
@@ -81,7 +81,7 @@ class Knowledge(Tool):
             logger.exception("Full traceback:")
             return Response(message=f"An error occurred during knowledge search: {error_message}", break_loop=False)
 
-    async def perform_perplexica_search(self, query, focus_mode):
+    def perform_perplexica_search(self, query, focus_mode):
         try:
             url = "http://100.108.162.61:3001/api/search"
             payload = json.dumps({
@@ -100,7 +100,7 @@ class Knowledge(Tool):
             headers = {
               'Content-Type': 'application/json'
             }
-            response = requests.request("POST", url, headers=headers, data=payload)
+            response = requests.post(url, headers=headers, data=payload)
             response.raise_for_status()
             logger.debug("Successfully connected to Perplexica")
 
