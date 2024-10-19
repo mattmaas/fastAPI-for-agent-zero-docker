@@ -128,7 +128,8 @@ class Knowledge(Tool):
             logger.error(f"Error in Perplexica search: {str(e)}")
             return {"message": "", "sources": []}
 
-    def prepare_research_document(self, perplexity_answer, sources):
+    def prepare_research_document(self, perplexity_answer, perplexica_result):
+        sources = perplexica_result['sources']
         document = f"Perplexity Answer:\n{perplexity_answer}\n\n"
         document += f"Perplexica Main Answer:\n{perplexica_result['message']}\n\n"
         document += "Research Document\n\n"
