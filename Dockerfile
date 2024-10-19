@@ -21,8 +21,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Set default environment variables
 ENV PERPLEXICA_API_URL="http://localhost:3001/api/search"
-ENV API_KEY_OPENAI="your-default-openai-api-key"
-ENV API_KEY_PERPLEXITY="your-default-perplexity-api-key"
+ENV API_KEY_OPENAI="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"
+ENV API_KEY_PERPLEXITY="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"
 
 # Expose the port the app runs on
 EXPOSE 8766
