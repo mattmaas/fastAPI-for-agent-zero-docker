@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import logging
 import asyncio
 import uuid
-from python.tools import memory_tool, knowledge_tool, online_knowledge_tool
+from python.tools import knowledge_tool, online_knowledge_tool
 from python.helpers import files
 
 load_dotenv()
