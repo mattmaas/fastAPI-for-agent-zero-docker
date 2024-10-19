@@ -4,6 +4,8 @@ import requests
 from python.tools import memory_tool
 import models
 
+logger = logging.getLogger(__name__)
+
 async def perplexity_search(query: str, agent=None) -> dict:
     logging.info(f"Perplexity search called with query: {query}")
     
