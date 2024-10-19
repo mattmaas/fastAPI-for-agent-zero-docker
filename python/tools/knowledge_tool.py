@@ -172,29 +172,9 @@ class Knowledge(Tool):
                 pdf_file = BytesIO(response.content)
                 pdf_reader = PyPDF2.PdfReader(pdf_file)
                 text = ""
-                images = []
 
                 for page in pdf_reader.pages:
                     text += page.extract_text() or ""
-
-                    # Extract images
-                    if '/XObject' in page['/Resources']:
-                        xObject = page['/Resources']['/XObject'].get_object()
-                        for obj in xObject:
-                            if xObject[obj]['/Subtype'] == '/Image':
-                                size = (xObject[obj]['/Width'], xObject[obj]['/Height'])
-                                data = xObject[obj]._data
-                                mode = "RGB" if xObject[obj]['/ColorSpace'] == '/DeviceRGB' else "P"
-                                img = Image.frombytes(mode, size, data)
-                                images.append(img)
-
-                # Save images if any
-                if images:
-                    image_dir = os.path.splitext(research_file_path)[0] + "_images"
-                    os.makedirs(image_dir, exist_ok=True)
-                    for i, img in enumerate(images):
-                        img_path = os.path.join(image_dir, f"image_{i}.png")
-                        img.save(img_path)
 
                 return text
 
