@@ -67,6 +67,10 @@ class Knowledge(Tool):
             await memory_tool.save(self.agent, f"Perplexica Search Answer for '{prompt}': {perplexica_result['message']}")
 
             # Save full contents of Perplexica sources to memory
+            for source in perplexica_result['sources']:
+                url = source['metadata'].get('url', '')
+                full_text = self.fetch_full_content(url, research_file_path)
+                await memory_tool.save(self.agent, f"Full content from '{url}': {full_text}")
 
             # Save Perplexity result to memory
             await memory_tool.save(self.agent, f"Perplexity Search Answer for '{prompt}': {perplexity_result}")
