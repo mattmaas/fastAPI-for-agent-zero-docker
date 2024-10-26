@@ -14,6 +14,7 @@ from datetime import datetime
 from python.helpers import files, perplexity_search
 from python.helpers.print_style import PrintStyle
 from python.helpers.research_logger import sanitize_filename
+from models import get_openai_chat
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
