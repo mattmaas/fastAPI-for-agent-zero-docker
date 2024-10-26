@@ -45,10 +45,6 @@ class Knowledge(Tool):
             memories = await memory_tool.search(self.agent, prompt)
             logger.debug(f"Fetched memories. Count: {len(memories)}")
 
-            # Fetch related memories
-            memories = await memory_tool.search(self.agent, prompt)
-            logger.debug(f"Fetched memories. Count: {len(memories)}")
-
             # Generate unique filename based on timestamp and query
             sanitized_query = sanitize_filename(prompt)[:100]
             filename = f"{self.timestamp}_{sanitized_query}.txt"
