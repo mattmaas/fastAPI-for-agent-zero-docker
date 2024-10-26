@@ -16,8 +16,7 @@ async def generate_executive_summary(prompt: str) -> str:
             model="o1-preview",
             messages=[
                 {"role": "user", "content": enhanced_prompt}
-            ],
-            temperature=0.7
+            ]
         )
         
         return response.choices[0].message.content
