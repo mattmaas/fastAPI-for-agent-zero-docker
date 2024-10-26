@@ -91,7 +91,7 @@ class Knowledge(Tool):
                 f"Perplexity Summary:\n{perplexity_result}\n\n"
                 f"Perplexica Summary:\n{perplexica_result['message']}\n\n"
                 f"Source Content Summary:\n{sources_summary}\n\n"
-                "Focus on:\n"
+                "Tips:\n"
                 "- Synthesizing the key points from all summaries\n"
                 "- Important findings and conclusions\n"
                 "- Major themes and concepts\n"
