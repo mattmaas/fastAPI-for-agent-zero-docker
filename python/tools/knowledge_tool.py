@@ -225,7 +225,7 @@ class Knowledge(Tool):
 
         return document
 
-    async def prepare_agent_message(self, perplexity_answer, perplexica_summary, research_file_path):
+    async def prepare_agent_message(self, perplexity_answer, perplexica_summary, research_file_path, executive_summary):
         return f"Executive Summary:\n{executive_summary}\n\nDetailed research has been saved to: {research_file_path}"
     def fetch_full_content(self, url, research_file_path):
         try:
