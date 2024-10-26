@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 import logging
 import asyncio
 import uuid
+import json
+import requests
 from python.tools import knowledge_tool, online_knowledge_tool, memory_tool, knowledge_lite_tool, research_import_tool
 from python.helpers import files
 
