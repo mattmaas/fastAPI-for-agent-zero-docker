@@ -111,21 +111,6 @@ class Knowledge(Tool):
             # Save Perplexity result to memory
             await memory_tool.save(self.agent, f"Perplexity Search Answer for '{prompt}': {perplexity_result}")
 
-            # Generate source content summary using GPT-4
-            sources_summary_prompt = files.read_file("prompts/tool.knowledge.source_summary.md")
-            sources_content = ""
-            for source in perplexica_result['sources']:
-                url = source['metadata'].get('url', '')
-                full_text = self.fetch_full_content(url, research_file_path)
-                sources_content += f"\nSource: {source['metadata'].get('title', 'N/A')}\n{full_text}\n"
-
-            sources_summary = await self.agent.send_adhoc_message(
-                system="You are a research assistant tasked with creating detailed, accurate summaries of source materials.",
-                msg=sources_summary_prompt + "\n\nSources:\n" + sources_content,
-                output_label="Generating source content summary"
-            )
-            await memory_tool.save(self.agent, f"Source Content Summary for '{prompt}': {sources_summary}")
-
 
             # Prepare the message for the agent
             logger.debug("Preparing agent message")
