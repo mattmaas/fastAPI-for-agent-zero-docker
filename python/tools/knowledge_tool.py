@@ -92,7 +92,8 @@ class Knowledge(Tool):
                 memories,
                 research_file_path,
                 sources_summary,
-                executive_summary
+                executive_summary,
+                prompt
             )
 
             # Save the research document
@@ -112,8 +113,8 @@ class Knowledge(Tool):
                 logger.error(f"Error saving research document: {str(e)}")
                 raise
 
-            # Save Perplexica initial results to memory
-            await memory_tool.save(self.agent, f"Perplexica Search Answer for '{prompt}': {perplexica_result['message']}")
+            # Save Perplexica initial result to memory
+            await memory_tool.save(self.agent, f"Perplexica Search Answer for '{prompt}': {perplexica_result}")
             
             # Save Perplexity result to memory
             await memory_tool.save(self.agent, f"Perplexity Search Answer for '{prompt}': {perplexity_result}")
@@ -177,8 +178,8 @@ class Knowledge(Tool):
             logger.error(f"Error in Perplexica search: {str(e)}")
             return {"message": "", "sources": []}
 
-    def prepare_research_document(self, perplexity_answer, perplexica_sources, perplexica_message, memories, research_file_path, sources_summary, executive_summary):
-        document = f"Research Summary\n\n"
+    def prepare_research_document(self, perplexity_answer, perplexica_sources, perplexica_message, memories, research_file_path, sources_summary, executive_summary, prompt):
+        document = f"Research Query: {prompt}\n\n"
         document += f"Executive Summary:\n{executive_summary}\n\n"
         document += f"Perplexica Summary:\n{perplexica_message}\n\n"
         document += f"Perplexity Summary:\n{perplexity_answer}\n\n"
@@ -199,6 +200,7 @@ class Knowledge(Tool):
 
     async def prepare_agent_message(self, perplexity_answer, perplexica_summary, research_file_path, executive_summary):
         return f"Executive Summary:\n{executive_summary}\n\nDetailed research has been saved to: {research_file_path}\n\n"
+        
     def fetch_full_content(self, url, research_file_path):
         try:
             if not url:

@@ -23,7 +23,7 @@ class KnowledgeLite(Tool):
             return Response(message="No prompt provided for knowledge search", break_loop=False)
 
         try:
-            work_dir = self.agent.get_data("work_dir") or os.getcwd()
+            work_dir = '/work_dir'
 
             # Perplexica search
             perplexica_result = self.perform_perplexica_search(prompt, focus_mode)
