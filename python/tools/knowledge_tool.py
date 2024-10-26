@@ -144,18 +144,30 @@ class Knowledge(Tool):
             return {"message": "", "sources": []}
 
     def prepare_research_document(self, perplexity_answer, perplexica_sources, perplexica_message, memories, research_file_path):
-        sources = perplexica_sources
-        document = f"Perplexity Answer:\n{perplexity_answer}\n\n"
-        document += f"Perplexica Summary:\n{perplexica_message}\n\n"
-        document += f"Related Memories:\n{memories}\n\n"
-        document += "Research Document\n\n"
-        document += "Perplexica Sources:\n"
-        for source in sources:
+        document = (
+            f"Research Document\n\n"
+            f"Executive Summary Instructions:\n"
+            f"Please provide a comprehensive synthesis that preserves specific details, numerical data, and key findings. "
+            f"Rather than just listing topics, extract and combine the core insights from all sources while maintaining "
+            f"the precision and depth of the original information.\n\n"
+            f"Perplexity Answer:\n{perplexity_answer}\n\n"
+            f"Perplexica Summary:\n{perplexica_message}\n\n"
+            f"Related Memories:\n{memories}\n\n"
+            f"Detailed Source Analysis:\n"
+            f"When summarizing each source, focus on extracting and preserving:\n"
+            f"- Key findings and conclusions\n"
+            f"- Specific data points and statistics\n"
+            f"- Methodologies and approaches used\n"
+            f"- Important relationships and correlations\n"
+            f"- Concrete examples and case studies\n\n"
+            f"Source Contents:\n"
+        )
+        
+        for source in perplexica_sources:
             url = source['metadata'].get('url', '')
+            title = source['metadata'].get('title', 'N/A')
             full_text = self.fetch_full_content(url, research_file_path)
-            document += f"Title: {source['metadata'].get('title', 'N/A')}\n"
-            document += f"URL: {url}\n"
-            document += f"Full Content:\n{full_text}\n\n"
+            document += f"\n=== Source: {title} ===\nURL: {url}\n\nDetailed Content:\n{full_text}\n\n"
 
         return document
 

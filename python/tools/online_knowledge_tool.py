@@ -8,19 +8,18 @@ import os
 
 class OnlineKnowledge(Tool):
     async def execute(self, **kwargs):
-        perplexity_result = await perplexity_search.perplexity_search(self.args["prompt"])
-        
-        # Log the full research results
-        work_dir = self.agent.get_data("work_dir") or os.getcwd()
-        research_logger.log_research(query=self.args["prompt"], answer=perplexity_result, work_dir=work_dir)
-    
-        # Fetch related memories
-        memories = await memory_tool.search(self.agent, self.args["prompt"])
-
-        # Prepare the response for the agent
-        response = f"Perplexity Answer: {perplexity_result}\n\nRelated Memories:\n{memories}\n"
-
-        return Response(
-            message=response,
-            break_loop=False,
-        )
+        try:
+            # Just do the perplexity search and memory recall
+            perplexity_result = await perplexity_search.perplexity_search(self.args["prompt"])
+            memories = await memory_tool.search(self.agent, self.args["prompt"])
+            
+            # Save the search result to memory
+            await memory_tool.save(self.agent, f"Perplexity Search Result: {perplexity_result}")
+            
+            return Response(
+                message=f"Perplexity Answer: {perplexity_result}\n\nRelated Memories:\n{memories}\n",
+                break_loop=False
+            )
+        except Exception as e:
+            logger.error(f"Error in OnlineKnowledge.execute: {str(e)}")
+            return Response(message=f"Error occurred: {str(e)}", break_loop=False)

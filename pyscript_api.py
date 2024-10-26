@@ -95,7 +95,7 @@ def perplexity_search(prompt=""):
     url = f"{BASE_URL}/perplexity_search"
     data = {"prompt": prompt}
 
-    response = requests.post(url, json=data, timeout=180)
+    response = requests.post(url, json=data, timeout=600)  # 10 minutes
     result = process_response(response, "perplexity_search")
     logger.info(result)
     return result
