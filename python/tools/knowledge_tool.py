@@ -170,10 +170,12 @@ class Knowledge(Tool):
             return {"message": "", "sources": []}
 
     def prepare_research_document(self, perplexity_answer, perplexica_sources, perplexica_message, memories, research_file_path, sources_summary, executive_summary):
-        document = f"Executive Summary:\n{executive_summary}\n\n"
+        document = f"Research Summary\n\n"
+        document += f"Executive Summary:\n{executive_summary}\n\n"
         document += f"Perplexica Summary:\n{perplexica_message}\n\n"
         document += f"Perplexity Summary:\n{perplexity_answer}\n\n"
         document += f"Source Content Summary:\n{sources_summary}\n\n"
+        document += f"Related Memories:\n{memories}\n\n"
         document += f"Source URLs:\n"
         for source in perplexica_sources:
             document += f"{source['metadata'].get('url', 'N/A')}\n"
