@@ -80,10 +80,10 @@ def recall(prompt, count=5, threshold=0.1):
     logger.info(result)
     return result
 
-def research(prompt=""):
+def research(prompt="", focus_mode="webSearch"):
     """Perform research on a given topic."""
     url = f"{BASE_URL}/research"
-    data = {"prompt": prompt}
+    data = {"prompt": prompt, "focus_mode": focus_mode}
 
     response = requests.post(url, json=data, timeout=180)
     result = process_response(response, "research")
