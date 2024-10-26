@@ -61,11 +61,17 @@ class Knowledge(Tool):
 
             # Use o1-mini model specifically for source content summarization
             client = OpenAI(api_key=os.getenv("API_KEY_OPENAI"))
+            
+            # Combine instruction with content since o1-mini doesn't support system messages
+            enhanced_prompt = (
+                "You are a research assistant tasked with creating detailed, accurate summaries of source materials.\n\n"
+                f"{sources_summary_prompt}\n\nSources:\n{sources_content}"
+            )
+            
             response = client.chat.completions.create(
                 model="o1-mini",
                 messages=[
-                    {"role": "system", "content": "You are a research assistant tasked with creating detailed, accurate summaries of source materials."},
-                    {"role": "user", "content": sources_summary_prompt + "\n\nSources:\n" + sources_content}
+                    {"role": "user", "content": enhanced_prompt}
                 ]
             )
             sources_summary = response.choices[0].message.content
