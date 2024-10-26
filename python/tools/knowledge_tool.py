@@ -54,8 +54,50 @@ class Knowledge(Tool):
             filename = f"{self.timestamp}_{sanitized_query}.txt"
             research_file_path = os.path.join(work_dir, filename)
 
-            # Prepare the research document
-            research_document = self.prepare_research_document(perplexity_result, perplexica_result['sources'], perplexica_result['message'], memories, research_file_path)
+            # Generate source content summary using GPT-4
+            sources_summary_prompt = files.read_file("prompts/tool.knowledge.source_summary.md")
+            sources_content = ""
+            for source in perplexica_result['sources']:
+                url = source['metadata'].get('url', '')
+                full_text = self.fetch_full_content(url, research_file_path)
+                sources_content += f"\nSource: {source['metadata'].get('title', 'N/A')}\n{full_text}\n"
+
+            sources_summary = await self.agent.send_adhoc_message(
+                system="You are a research assistant tasked with creating detailed, accurate summaries of source materials.",
+                msg=sources_summary_prompt + "\n\nSources:\n" + sources_content,
+                output_label="Generating source content summary"
+            )
+
+            # Generate executive summary
+            executive_summary_prompt = (
+                "Please provide an executive summary synthesizing these summaries:\n\n"
+                f"Perplexity Summary:\n{perplexity_result}\n\n"
+                f"Perplexica Summary:\n{perplexica_result['message']}\n\n"
+                f"Source Content Summary:\n{sources_summary}\n\n"
+                "Tips:\n"
+                "- Synthesize the key points from all summaries\n"
+                "- Include important findings and conclusions\n"
+                "- Highlight major themes and concepts\n"
+                "- Note essential facts and details\n"
+                "- Present core insights across sources"
+            )
+
+            executive_summary = await self.agent.send_adhoc_message(
+                system="You are an executive assistant tasked with creating concise, comprehensive summaries.",
+                msg=executive_summary_prompt,
+                output_label="Generating executive summary"
+            )
+
+            # Prepare and save the research document
+            research_document = self.prepare_research_document(
+                perplexity_result,
+                perplexica_result['sources'],
+                perplexica_result['message'],
+                memories,
+                research_file_path,
+                sources_summary,
+                executive_summary
+            )
 
             # Save the research document
             with open(research_file_path, "w", encoding="utf-8") as f:
