@@ -46,8 +46,21 @@ class KnowledgeLite(Tool):
             for source in perplexica_result['sources']:
                 research_document += f"{source['metadata'].get('url', 'N/A')}\n"
 
-            with open(research_file_path, "w", encoding="utf-8") as f:
-                f.write(research_document)
+            try:
+                os.makedirs(os.path.dirname(research_file_path), exist_ok=True)
+                with open(research_file_path, "w", encoding="utf-8") as f:
+                    f.write(research_document)
+                logger.info(f"Research document successfully saved to {research_file_path}")
+                
+                # Verify file was created
+                if not os.path.exists(research_file_path):
+                    raise FileNotFoundError(f"Failed to create research file at {research_file_path}")
+                    
+                file_size = os.path.getsize(research_file_path)
+                logger.info(f"Research file size: {file_size} bytes")
+            except Exception as e:
+                logger.error(f"Error saving research document: {str(e)}")
+                raise
 
             # Save results to memory
             await memory_tool.save(self.agent, f"Perplexica Search Answer for '{prompt}': {perplexica_result['message']}")
