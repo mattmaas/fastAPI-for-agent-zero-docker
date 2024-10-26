@@ -11,7 +11,7 @@ from agent import Agent
 from . import memory_tool
 from python.helpers.tool import Tool, Response
 from datetime import datetime
-from python.helpers import files, perplexity_search
+from python.helpers import files, perplexity_search, models
 from python.helpers.print_style import PrintStyle
 from python.helpers.research_logger import sanitize_filename
 
@@ -81,7 +81,7 @@ class Knowledge(Tool):
                 system="You are a research assistant tasked with creating detailed, accurate summaries of source materials.",
                 msg=sources_summary_prompt + "\n\nSources:\n" + sources_content,
                 output_label="Generating source content summary",
-                config={"chat_model": models.get_openai_chat(model_name="gpt-4o")}
+                config=self.agent.config
             )
             await memory_tool.save(self.agent, f"Source Content Summary for '{prompt}': {sources_summary}")
 
@@ -101,7 +101,7 @@ class Knowledge(Tool):
 
             # Create temporary config for o1-preview model
             o1_config = self.agent.config.copy()
-            o1_config.chat_model = models.get_openai_chat(model_name="o1-preview", api_key=None)
+            o1_config.chat_model = self.agent.config.chat_model
             
             executive_summary = await self.agent.send_adhoc_message(
                 system="You are an executive assistant tasked with creating concise, comprehensive summaries.",
@@ -188,7 +188,7 @@ class Knowledge(Tool):
         for source in perplexica_sources:
             document += f"{source['metadata'].get('url', 'N/A')}\n"
         document += "\nFull Source Contents:\n"
-        for source in sources:
+        for source in perplexica_sources:
             url = source['metadata'].get('url', '')
             full_text = self.fetch_full_content(url, research_file_path)
             document += f"Title: {source['metadata'].get('title', 'N/A')}\n"
