@@ -144,8 +144,29 @@ class Knowledge(Tool):
             return {"message": "", "sources": []}
 
     def prepare_research_document(self, perplexity_answer, perplexica_sources, perplexica_message, memories, research_file_path):
+        # First prepare the executive summary using the utility model
+        summarization_prompt = (
+            "Please provide a comprehensive executive summary of the following research content. "
+            "Focus on:\n"
+            "- Key findings and conclusions\n"
+            "- Specific data points and statistics\n"
+            "- Methodologies and approaches used\n"
+            "- Important relationships and correlations\n"
+            "- Concrete examples and case studies\n\n"
+            f"Perplexity Answer:\n{perplexity_answer}\n\n"
+            f"Perplexica Summary:\n{perplexica_message}\n\n"
+            f"Related Memories:\n{memories}\n"
+        )
+        
+        executive_summary = asyncio.run(self.agent.send_adhoc_message(
+            system="You are a research assistant tasked with creating detailed, accurate executive summaries.",
+            msg=summarization_prompt,
+            output_label="Generating executive summary"
+        ))
+
         document = (
             f"Research Document\n\n"
+            f"Executive Summary:\n{executive_summary}\n\n"
             f"Perplexity Answer:\n{perplexity_answer}\n\n"
             f"Perplexica Summary:\n{perplexica_message}\n\n"
             f"Related Memories:\n{memories}\n\n"
