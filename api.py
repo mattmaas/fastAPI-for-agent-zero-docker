@@ -218,10 +218,36 @@ async def reddit_search(request: ResearchRequest):
     return await perform_focused_search(request, "redditSearch")
 
 async def perform_focused_search(request: ResearchRequest, focus_mode: str):
-    agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
-    tool = knowledge_tool.Knowledge(agent=agent, name="knowledge", args={"prompt": request.prompt, "focus_mode": focus_mode}, message="")
-    response = await tool.execute()
-    return {"result": response.message}
+    """Direct focused search using Perplexica API without full research pipeline"""
+    try:
+        base_url = os.getenv("PERPLEXICA_API_URL", "http://localhost:3001/api")
+        url = f"{base_url}/search"
+        payload = json.dumps({
+            "chatModel": {
+                "provider": "openai",
+                "model": "gpt-4o"
+            },
+            "embeddingModel": {
+                "provider": "openai",
+                "model": "text-embedding-3-large"
+            },
+            "optimizationMode": "speed",
+            "focusMode": focus_mode,
+            "query": request.prompt
+        })
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        response = requests.post(url, headers=headers, data=payload, timeout=45)
+        response.raise_for_status()
+        
+        # Return the raw Perplexica response
+        result = response.json()
+        return {"result": result}
+        
+    except Exception as e:
+        logging.error(f"Error in focused search: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn
