@@ -166,7 +166,6 @@ class ResearchRequest(BaseModel):
     prompt: str
     focus_mode: str = "webSearch"
     email: str | None = None
-    email: str | None = None
 
 @app.post("/research")
 async def research(request: ResearchRequest):
