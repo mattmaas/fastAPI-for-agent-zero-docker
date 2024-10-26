@@ -94,9 +94,9 @@ class Knowledge(Tool):
                 "Focus on:\n"
                 "- Key findings and conclusions\n"
                 "- Specific data points and statistics\n"
-                "- Methodologies and approaches\n"
-                "- Important relationships and correlations\n"
-                "- Concrete examples and case studies"
+                "- Notable facts and details\n"
+                "- Direct quotes and references\n"
+                "- Technical specifications when present"
             )
 
             # Create temporary config for o1-preview model
