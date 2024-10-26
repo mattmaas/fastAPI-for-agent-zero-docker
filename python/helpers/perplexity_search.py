@@ -6,7 +6,7 @@ async def perplexity_search(query: str, model_name="llama-3.1-sonar-large-128k-o
     logging.info(f"Perplexity search called with query: {query}")
     
     api_key = api_key or models.get_api_key("perplexity")
-    logging.info(f"Using API key: {api_key[:5]}...{api_key[-5:]}")  # Log part of the API key for debugging
+    logging.info("Using Perplexity API key")  # Don't log any part of the API key
 
     client = OpenAI(api_key=api_key, base_url=base_url)
         
