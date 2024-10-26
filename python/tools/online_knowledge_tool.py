@@ -1,3 +1,4 @@
+import logging
 from agent import Agent
 from python.helpers import perplexity_search
 from python.tools import memory_tool
@@ -5,6 +6,10 @@ from python.helpers.tool import Tool, Response
 from python.helpers import research_logger
 import asyncio
 import os
+
+# Configure logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 class OnlineKnowledge(Tool):
     async def execute(self, **kwargs):
