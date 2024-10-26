@@ -166,6 +166,7 @@ class ResearchRequest(BaseModel):
     prompt: str
     focus_mode: str = "webSearch"
     email: str | None = None
+    email: str | None = None
 
 @app.post("/research")
 async def research(request: ResearchRequest):
@@ -219,6 +220,8 @@ async def youtube_search(request: ResearchRequest):
 @app.post("/reddit_search")
 async def reddit_search(request: ResearchRequest):
     return await perform_focused_search(request, "redditSearch")
+
+from python.helpers.email_notifier import send_email
 
 from python.helpers.email_notifier import send_email
 
