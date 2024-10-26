@@ -9,11 +9,13 @@ async def generate_executive_summary(prompt: str) -> str:
     try:
         client = OpenAI(api_key=os.getenv("API_KEY_OPENAI"))
         
+        # Combine instruction with prompt since o1-preview doesn't support system messages
+        enhanced_prompt = "As an executive assistant, create a concise, comprehensive summary.\n\n" + prompt
+        
         response = client.chat.completions.create(
             model="o1-preview",
             messages=[
-                {"role": "system", "content": "You are an executive assistant tasked with creating concise, comprehensive summaries."},
-                {"role": "user", "content": prompt}
+                {"role": "user", "content": enhanced_prompt}
             ],
             temperature=0.7
         )
