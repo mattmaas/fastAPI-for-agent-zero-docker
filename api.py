@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import logging
 import asyncio
 import uuid
-from python.tools import knowledge_tool, online_knowledge_tool, memory_tool, knowledge_lite_tool
+from python.tools import knowledge_tool, online_knowledge_tool, memory_tool, knowledge_lite_tool, research_import_tool
 from python.helpers import files
 
 load_dotenv()
@@ -188,6 +188,17 @@ async def research_lite(request: ResearchRequest):
     tool = knowledge_lite_tool.Knowledge(agent=agent, name="knowledge_lite", args={"prompt": request.prompt, "focus_mode": request.focus_mode}, message="")
     response = await tool.execute()
     return {"result": response.message}
+
+@app.post("/import-research")
+async def import_research():
+    try:
+        agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
+        tool = research_import_tool.ResearchImport(agent=agent, name="research_import", args={}, message="")
+        response = await tool.execute()
+        return {"result": response.message}
+    except Exception as e:
+        logging.error(f"Error in import-research endpoint: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/web_search")
 async def web_search(request: ResearchRequest):
