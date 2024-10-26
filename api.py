@@ -59,9 +59,6 @@ class RecallRequest(BaseModel):
 class ForgetRequest(BaseModel):
     prompt: str
 
-class ResearchRequest(BaseModel):
-    prompt: str
-
 def log_agent_response(agent_id: str, prompt: str, response: str, is_final: bool = False):
     log_dir = os.path.join(os.getcwd(), 'logs')
     os.makedirs(log_dir, exist_ok=True)
