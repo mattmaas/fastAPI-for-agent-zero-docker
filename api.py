@@ -185,7 +185,7 @@ async def perplexity_search(request: ResearchRequest):
 @app.post("/research-lite")
 async def research_lite(request: ResearchRequest):
     agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
-    tool = knowledge_lite_tool.Knowledge(agent=agent, name="knowledge_lite", args={"prompt": request.prompt, "focus_mode": request.focus_mode}, message="")
+    tool = knowledge_lite_tool.KnowledgeLite(agent=agent, name="knowledge_lite", args={"prompt": request.prompt, "focus_mode": request.focus_mode}, message="")
     response = await tool.execute()
     return {"result": response.message}
 
