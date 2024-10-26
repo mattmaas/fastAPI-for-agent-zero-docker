@@ -122,8 +122,7 @@ class Knowledge(Tool):
             sources_summary = await self.agent.send_adhoc_message(
                 system="You are a research assistant tasked with creating detailed, accurate summaries of source materials.",
                 msg=sources_summary_prompt + "\n\nSources:\n" + sources_content,
-                output_label="Generating source content summary",
-                config=self.agent.config
+                output_label="Generating source content summary"
             )
             await memory_tool.save(self.agent, f"Source Content Summary for '{prompt}': {sources_summary}")
 
@@ -141,15 +140,10 @@ class Knowledge(Tool):
                 "- Core insights across sources"
             )
 
-            # Create temporary config for o1-preview model
-            o1_config = self.agent.config.copy()
-            o1_config.chat_model = self.agent.config.chat_model
-            
             executive_summary = await self.agent.send_adhoc_message(
                 system="You are an executive assistant tasked with creating concise, comprehensive summaries.",
                 msg=executive_summary_prompt,
-                output_label="Generating executive summary",
-                config=o1_config
+                output_label="Generating executive summary"
             )
             await memory_tool.save(self.agent, f"Executive Summary for '{prompt}': {executive_summary}")
 
