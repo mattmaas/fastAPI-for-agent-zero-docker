@@ -36,20 +36,13 @@ class KnowledgeLite(Tool):
             filename = f"{self.timestamp}_{sanitized_query}.txt"
             research_file_path = os.path.join(work_dir, filename)
 
-            # Generate executive summary
-            executive_summary_prompt = (
-                "Please provide an executive summary synthesizing these summaries:\n\n"
+            # Generate executive report
+            summaries_prompt = (
                 f"Perplexity Summary:\n{perplexity_result}\n\n"
                 f"Perplexica Summary:\n{perplexica_result['message']}\n\n"
-                "Tips:\n"
-                "- Synthesize the key points from all summaries\n"
-                "- Include important findings and conclusions\n"
-                "- Highlight major themes and concepts\n"
-                "- Note essential facts and details\n"
-                "- Present core insights across sources"
             )
 
-            executive_summary = await o1_preview.generate_executive_summary(executive_summary_prompt)
+            executive_summary = await o1_preview.generate_executive_summary(prompt, summaries_prompt)
 
             # Prepare and save the research document
             research_document = (
