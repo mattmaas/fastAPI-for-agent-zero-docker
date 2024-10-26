@@ -146,20 +146,9 @@ class Knowledge(Tool):
     def prepare_research_document(self, perplexity_answer, perplexica_sources, perplexica_message, memories, research_file_path):
         document = (
             f"Research Document\n\n"
-            f"Executive Summary Instructions:\n"
-            f"Please provide a comprehensive synthesis that preserves specific details, numerical data, and key findings. "
-            f"Rather than just listing topics, extract and combine the core insights from all sources while maintaining "
-            f"the precision and depth of the original information.\n\n"
             f"Perplexity Answer:\n{perplexity_answer}\n\n"
             f"Perplexica Summary:\n{perplexica_message}\n\n"
             f"Related Memories:\n{memories}\n\n"
-            f"Detailed Source Analysis:\n"
-            f"When summarizing each source, focus on extracting and preserving:\n"
-            f"- Key findings and conclusions\n"
-            f"- Specific data points and statistics\n"
-            f"- Methodologies and approaches used\n"
-            f"- Important relationships and correlations\n"
-            f"- Concrete examples and case studies\n\n"
             f"Source Contents:\n"
         )
         
@@ -172,10 +161,36 @@ class Knowledge(Tool):
         return document
 
     async def prepare_agent_message(self, perplexity_answer, perplexica_summary, research_file_path):
-        combined_result = f"{perplexity_answer}\n\n{perplexica_summary}"
-        return files.read_file("prompts/tool.knowledge.response.md", 
-                               combined_result=combined_result,
-                               research_file_path=research_file_path)
+        # First, read the research document
+        with open(research_file_path, 'r', encoding='utf-8') as f:
+            research_content = f.read()
+        
+        # Prepare detailed summarization instructions
+        summarization_prompt = (
+            "Please provide a comprehensive synthesis of the following research content. "
+            "Focus on:\n"
+            "- Preserving specific details, numerical data, and key findings\n"
+            "- Extracting and combining core insights from all sources\n"
+            "- Maintaining precision and depth of the original information\n"
+            "- Key findings and conclusions\n"
+            "- Specific data points and statistics\n"
+            "- Methodologies and approaches used\n"
+            "- Important relationships and correlations\n"
+            "- Concrete examples and case studies\n\n"
+            f"Research Content:\n{research_content}"
+        )
+        
+        # Get the summary using the utility model
+        summary = await self.agent.send_adhoc_message(
+            system="You are a research assistant tasked with creating detailed, accurate summaries.",
+            msg=summarization_prompt,
+            output_label="Generating research summary"
+        )
+        
+        # Return the formatted response
+        return files.read_file("prompts/tool.knowledge.response.md",
+                             combined_result=summary,
+                             research_file_path=research_file_path)
     def fetch_full_content(self, url, research_file_path):
         try:
             if not url:

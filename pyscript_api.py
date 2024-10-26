@@ -28,7 +28,7 @@ def run_agent(prompt, timeout=None):
         "timeout": timeout
     }
 
-    response = requests.post(url, json=data, timeout=600)  # 10 minutes
+    response = requests.post(url, json=data, timeout=300)  # 5 minutes
     result = process_response(response, "run_agent")
     logger.info(result)
     return result
