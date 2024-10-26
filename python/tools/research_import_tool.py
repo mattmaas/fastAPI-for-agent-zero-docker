@@ -20,7 +20,7 @@ class ResearchImport(Tool):
                 with open(filepath, 'r', encoding='utf-8') as f:
                     content = f.read()
                 
-                # Generate a memory prompt using GPT-4-mini
+                # Generate a memory prompt using gpt-4o-mini
                 prompt_system = "You are an AI assistant tasked with creating a concise prompt that describes the main topic and key points of a research document. This prompt will be used to store the research in a memory bank."
                 prompt_request = f"Please create a brief prompt (2-3 sentences) that captures the essence of this research document:\n\n{content[:2000]}..."  # First 2000 chars for context
                 
