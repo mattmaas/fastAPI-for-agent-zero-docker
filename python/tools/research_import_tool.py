@@ -22,12 +22,16 @@ class ResearchImport(Tool):
                 
                 # Generate a memory prompt using gpt-4o-mini
                 prompt_system = "You are an AI assistant tasked with creating a concise prompt that describes the main topic and key points of a research document. This prompt will be used to store the research in a memory bank."
-                prompt_request = f"Please create a brief prompt (2-3 sentences) that captures the essence of this research document:\n\n{content[:1500]}..."  # First 2000 chars for context
+                # Get first 25 lines
+                first_25_lines = '\n'.join(content.split('\n')[:25])
+                
+                prompt_request = f"Please create a brief prompt (2-3 sentences) that captures the essence of this research document:\n\n{first_25_lines}..."
                 
                 memory_prompt = await self.agent.send_adhoc_message(
                     system=prompt_system,
                     msg=prompt_request,
-                    output_label=f"Generating memory prompt for {filename}"
+                    output_label=f"Generating memory prompt for {filename}",
+                    model="gpt-4o-mini"
                 )
                 
                 # Save to memory with the generated prompt
