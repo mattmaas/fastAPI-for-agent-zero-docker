@@ -111,7 +111,7 @@ async def run_agent(request: AgentRequest):
     agent = Agent(number=len(agents), config=config)
     agents[agent_id] = agent
     
-    timeout = request.timeout or 180  # 3 minutes default for non-async runs
+    timeout = request.timeout or 300  # 5 minutes default for non-async runs
     
     try:
         await asyncio.to_thread(log_agent_response, agent_id, request.prompt, "Agent started", is_final=False)
