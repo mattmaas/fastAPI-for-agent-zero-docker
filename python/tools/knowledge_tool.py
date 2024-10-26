@@ -62,17 +62,8 @@ class Knowledge(Tool):
             # Use o1-mini model specifically for source content summarization
             client = OpenAI(api_key=os.getenv("API_KEY_OPENAI"))
             
-            # Combine instruction with content since o1-mini doesn't support system messages
-            enhanced_prompt = (
-                "Create a comprehensive knowledge distillation that preserves the most valuable information from all sources. Your task:\n\n"
-                "1. Extract and maintain key technical details, specific examples, and important citations\n"
-                "2. Preserve numerical data, methodologies, and concrete evidence\n"
-                "3. Include relevant context that makes the information reusable\n"
-                "4. Maintain a dense, information-rich format while eliminating redundancy\n"
-                "5. Structure the content to maximize future reference value\n\n"
-                "Focus on capturing the essence and supporting details that make the knowledge actionable and reusable, not just high-level summaries.\n\n"
-                f"{sources_summary_prompt}\n\nSources:\n{sources_content}"
-            )
+            # Use the existing prompt file for source summarization instruction
+            enhanced_prompt = f"{sources_summary_prompt}\n\nSources:\n{sources_content}"
             
             response = client.chat.completions.create(
                 model="o1-mini",
