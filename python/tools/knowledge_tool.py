@@ -11,7 +11,7 @@ from agent import Agent
 from . import memory_tool
 from python.helpers.tool import Tool, Response
 from datetime import datetime
-from python.helpers import files, perplexity_search, models
+from python.helpers import files, perplexity_search
 from python.helpers.print_style import PrintStyle
 from python.helpers.research_logger import sanitize_filename
 
@@ -147,17 +147,7 @@ class Knowledge(Tool):
               },
               "optimizationMode": "speed",
               "focusMode": focus_mode,
-              "query": query,
-              "history": [
-                [
-                  "human",
-                  "Hi, how are you?"
-                ],
-                [
-                  "assistant",
-                  "I am doing well, how can I help you today?"
-                ]
-              ]
+              "query": query
             })
             headers = {
               'Content-Type': 'application/json'
