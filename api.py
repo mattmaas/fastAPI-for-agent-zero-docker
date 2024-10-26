@@ -165,7 +165,6 @@ async def recall(request: RecallRequest):
 class ResearchRequest(BaseModel):
     prompt: str
     focus_mode: str = "webSearch"
-    email: str | None = None
 
 @app.post("/research")
 async def research(request: ResearchRequest):
@@ -220,10 +219,6 @@ async def youtube_search(request: ResearchRequest):
 async def reddit_search(request: ResearchRequest):
     return await perform_focused_search(request, "redditSearch")
 
-from python.helpers.email_notifier import send_email
-
-from python.helpers.email_notifier import send_email
-
 async def perform_focused_search(request: ResearchRequest, focus_mode: str):
     """Direct focused search using Perplexica API without full research pipeline"""
     try:
@@ -251,17 +246,6 @@ async def perform_focused_search(request: ResearchRequest, focus_mode: str):
         
         # Get the response
         result = response.json()
-        
-        # Send email notification if email was provided
-        if request.email:
-            email_subject = f"Search Results: {focus_mode}"
-            email_body = (
-                f"Search Query: {request.prompt}\n\n"
-                f"Focus Mode: {focus_mode}\n\n"
-                f"Results:\n{json.dumps(result, indent=2)}"
-            )
-            send_email(request.email, email_subject, email_body)
-            
         return {"result": result}
         
     except Exception as e:
