@@ -7,7 +7,7 @@ from python.tools import memory_tool
 class ResearchImport(Tool):
     async def execute(self, **kwargs):
         try:
-            work_dir = self.agent.get_data("work_dir") or os.getcwd()
+            work_dir = "/work_dir"
             imported_count = 0
             
             # Get all .txt files in work_dir
