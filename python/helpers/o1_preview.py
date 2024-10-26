@@ -13,9 +13,8 @@ async def generate_executive_summary(original_query: str, summaries_prompt: str)
         enhanced_prompt = (
             "Create a comprehensive executive summary that:\n"
             "1. Addresses the original query directly and thoroughly\n"
-            "2. Provides a detailed synthesis of all key points from each research source\n"
-            "3. Integrates relevant insights from your knowledge\n"
-            "4. Ensures all major findings from each source are captured and analyzed\n\n"
+            "2. Provides a detailed synthesis of all key points and major findings from each research source\n"
+            "3. Integrates relevant insights from your knowledge\n\n"
             f"Original Query:\n{original_query}\n\n"
             "Research Summaries to Synthesize:\n"
             f"{summaries_prompt}"
