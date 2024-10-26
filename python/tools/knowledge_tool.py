@@ -126,26 +126,6 @@ class Knowledge(Tool):
             )
             await memory_tool.save(self.agent, f"Source Content Summary for '{prompt}': {sources_summary}")
 
-            # Generate executive summary using o1-preview model
-            executive_summary_prompt = (
-                "Please provide an executive summary synthesizing these three summaries:\n\n"
-                f"Perplexity Summary:\n{perplexity_result}\n\n"
-                f"Perplexica Summary:\n{perplexica_result['message']}\n\n"
-                f"Source Content Summary:\n{sources_summary}\n\n"
-                "Tips:\n"
-                "- Synthesizing the key points from all summaries\n"
-                "- Important findings and conclusions\n"
-                "- Major themes and concepts\n"
-                "- Essential facts and details\n"
-                "- Core insights across sources"
-            )
-
-            executive_summary = await self.agent.send_adhoc_message(
-                system="You are an executive assistant tasked with creating concise, comprehensive summaries.",
-                msg=executive_summary_prompt,
-                output_label="Generating executive summary"
-            )
-            await memory_tool.save(self.agent, f"Executive Summary for '{prompt}': {executive_summary}")
 
             # Prepare the message for the agent
             logger.debug("Preparing agent message")
