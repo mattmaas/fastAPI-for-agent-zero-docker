@@ -3,6 +3,7 @@ import logging
 import json
 import requests
 import asyncio
+from openai import OpenAI
 from bs4 import BeautifulSoup
 import PyPDF2
 from io import BytesIO
@@ -58,11 +59,16 @@ class Knowledge(Tool):
                 full_text = self.fetch_full_content(url, research_file_path)
                 sources_content += f"\nSource: {source['metadata'].get('title', 'N/A')}\n{full_text}\n"
 
-            sources_summary = await self.agent.send_adhoc_message(
-                system="You are a research assistant tasked with creating detailed, accurate summaries of source materials.",
-                msg=sources_summary_prompt + "\n\nSources:\n" + sources_content,
-                output_label="Generating source content summary"
+            # Use o1-mini model specifically for source content summarization
+            client = OpenAI(api_key=os.getenv("API_KEY_OPENAI"))
+            response = client.chat.completions.create(
+                model="o1-mini",
+                messages=[
+                    {"role": "system", "content": "You are a research assistant tasked with creating detailed, accurate summaries of source materials."},
+                    {"role": "user", "content": sources_summary_prompt + "\n\nSources:\n" + sources_content}
+                ]
             )
+            sources_summary = response.choices[0].message.content
 
             # Generate executive report
             summaries_prompt = (
