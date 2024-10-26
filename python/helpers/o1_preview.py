@@ -11,17 +11,13 @@ async def generate_executive_summary(original_query: str, summaries_prompt: str)
         
         # Combine instruction with prompts since o1-preview doesn't support system messages
         enhanced_prompt = (
-            "As a research analyst, create an executive report that:\n"
-            "1. Analyzes and synthesizes the following research summaries\n"
-            "2. Specifically addresses the original research query\n"
-            "3. Provides insights and conclusions based on both the research data and your knowledge\n\n"
-            f"Original Research Query:\n{original_query}\n\n"
-            "Research Summaries to Analyze:\n"
-            f"{summaries_prompt}\n\n"
-            "Format your response as a professional executive report with clear sections for:\n"
-            "- Key Findings\n"
-            "- Analysis\n"
-            "- Recommendations/Conclusions"
+            "Create an executive summary that:\n"
+            "1. Addresses the original query\n"
+            "2. Synthesizes the key points from the research summaries\n"
+            "3. Adds relevant insights from your knowledge\n\n"
+            f"Original Query:\n{original_query}\n\n"
+            "Research Summaries:\n"
+            f"{summaries_prompt}"
         )
         
         response = client.chat.completions.create(
