@@ -63,13 +63,53 @@ class Knowledge(Tool):
 
             logger.debug(f"Research document saved to {research_file_path}")
 
-            # Save Perplexica result to memory
+            # Save Perplexica initial results to memory
             await memory_tool.save(self.agent, f"Perplexica Search Answer for '{prompt}': {perplexica_result['message']}")
-
-            # Save full contents of Perplexica sources to memory
-
+            
             # Save Perplexity result to memory
             await memory_tool.save(self.agent, f"Perplexity Search Answer for '{prompt}': {perplexity_result}")
+
+            # Generate source content summary using GPT-4
+            sources_summary_prompt = files.read_file("prompts/tool.knowledge.source_summary.md")
+            sources_content = ""
+            for source in perplexica_result['sources']:
+                url = source['metadata'].get('url', '')
+                full_text = self.fetch_full_content(url, research_file_path)
+                sources_content += f"\nSource: {source['metadata'].get('title', 'N/A')}\n{full_text}\n"
+
+            sources_summary = await self.agent.send_adhoc_message(
+                system="You are a research assistant tasked with creating detailed, accurate summaries of source materials.",
+                msg=sources_summary_prompt + "\n\nSources:\n" + sources_content,
+                output_label="Generating source content summary",
+                config={"chat_model": models.get_openai_chat(model_name="gpt-4o")}
+            )
+            await memory_tool.save(self.agent, f"Source Content Summary for '{prompt}': {sources_summary}")
+
+            # Generate executive summary using o1-preview model
+            executive_summary_prompt = (
+                "Please provide an executive summary synthesizing these three summaries:\n\n"
+                f"Perplexity Summary:\n{perplexity_result}\n\n"
+                f"Perplexica Summary:\n{perplexica_result['message']}\n\n"
+                f"Source Content Summary:\n{sources_summary}\n\n"
+                "Focus on:\n"
+                "- Key findings and conclusions\n"
+                "- Specific data points and statistics\n"
+                "- Methodologies and approaches\n"
+                "- Important relationships and correlations\n"
+                "- Concrete examples and case studies"
+            )
+
+            # Create temporary config for o1-preview model
+            o1_config = self.agent.config.copy()
+            o1_config.chat_model = models.get_openai_chat(model_name="o1-preview", api_key=None)
+            
+            executive_summary = await self.agent.send_adhoc_message(
+                system="You are an executive assistant tasked with creating concise, comprehensive summaries.",
+                msg=executive_summary_prompt,
+                output_label="Generating executive summary",
+                config=o1_config
+            )
+            await memory_tool.save(self.agent, f"Executive Summary for '{prompt}': {executive_summary}")
 
             # Prepare the message for the agent
             logger.debug("Preparing agent message")
@@ -139,13 +179,15 @@ class Knowledge(Tool):
             logger.error(f"Error in Perplexica search: {str(e)}")
             return {"message": "", "sources": []}
 
-    def prepare_research_document(self, perplexity_answer, perplexica_sources, perplexica_message, memories, research_file_path):
-        sources = perplexica_sources
-        document = f"Perplexity Answer:\n{perplexity_answer}\n\n"
+    def prepare_research_document(self, perplexity_answer, perplexica_sources, perplexica_message, memories, research_file_path, sources_summary, executive_summary):
+        document = f"Executive Summary:\n{executive_summary}\n\n"
         document += f"Perplexica Summary:\n{perplexica_message}\n\n"
-        document += f"Related Memories:\n{memories}\n\n"
-        document += "Research Document\n\n"
-        document += "Perplexica Sources:\n"
+        document += f"Perplexity Summary:\n{perplexity_answer}\n\n"
+        document += f"Source Content Summary:\n{sources_summary}\n\n"
+        document += f"Source URLs:\n"
+        for source in perplexica_sources:
+            document += f"{source['metadata'].get('url', 'N/A')}\n"
+        document += "\nFull Source Contents:\n"
         for source in sources:
             url = source['metadata'].get('url', '')
             full_text = self.fetch_full_content(url, research_file_path)
@@ -155,8 +197,8 @@ class Knowledge(Tool):
 
         return document
 
-    async def prepare_agent_message(self, perplexity_answer, perplexica_summary, research_file_path):
-        combined_result = f"{perplexity_answer}\n\n{perplexica_summary}"
+    async def prepare_agent_message(self, perplexity_answer, perplexica_summary, research_file_path, executive_summary):
+        combined_result = f"Executive Summary:\n{executive_summary}\n\nDetailed Results:\n{perplexity_answer}\n\n{perplexica_summary}"
         return files.read_file("prompts/tool.knowledge.response.md", 
                                combined_result=combined_result,
                                research_file_path=research_file_path)
