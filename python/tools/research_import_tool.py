@@ -30,8 +30,7 @@ class ResearchImport(Tool):
                 memory_prompt = await self.agent.send_adhoc_message(
                     system=prompt_system,
                     msg=prompt_request,
-                    output_label=f"Generating memory prompt for {filename}",
-                    model="gpt-4o-mini"
+                    output_label=f"Generating memory prompt for {filename}"
                 )
                 
                 # Save to memory with the generated prompt
