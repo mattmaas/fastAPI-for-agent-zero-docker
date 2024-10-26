@@ -163,17 +163,16 @@ async def recall(request: RecallRequest):
         logging.error(f"Error in recall endpoint: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/research")
-async def research(request: ResearchRequest):
-    agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
-    focus_mode = request.focus_mode if hasattr(request, 'focus_mode') else "webSearch"
-    tool = knowledge_tool.Knowledge(agent=agent, name="knowledge", args={"prompt": request.prompt, "focus_mode": focus_mode}, message="")
-    response = await tool.execute()
-    return {"result": response.message}
-
 class ResearchRequest(BaseModel):
     prompt: str
     focus_mode: str = "webSearch"
+
+@app.post("/research")
+async def research(request: ResearchRequest):
+    agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
+    tool = knowledge_tool.Knowledge(agent=agent, name="knowledge", args={"prompt": request.prompt, "focus_mode": request.focus_mode}, message="")
+    response = await tool.execute()
+    return {"result": response.message}
 
 @app.post("/perplexity_search")
 async def perplexity_search(request: ResearchRequest):
