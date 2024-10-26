@@ -127,7 +127,7 @@ class Knowledge(Tool):
             error_message = f"Error in Knowledge.execute: {str(e)}"
             logger.error(error_message)
             logger.exception("Full traceback:")
-            return Response(message=f"An error occurred during knowledge search: {error_message}", break_loop=False)
+            return Response(message=f"An error occurred during knowledge search: {str(e)}", break_loop=False)
 
     def perform_perplexica_search(self, query, focus_mode):
         try:
