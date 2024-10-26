@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import logging
 import asyncio
 import uuid
-from python.tools import knowledge_tool, online_knowledge_tool, memory_tool
+from python.tools import knowledge_tool, online_knowledge_tool, memory_tool, knowledge_lite_tool
 from python.helpers import files
 
 load_dotenv()
@@ -179,6 +179,13 @@ class ResearchRequest(BaseModel):
 async def perplexity_search(request: ResearchRequest):
     agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
     tool = online_knowledge_tool.OnlineKnowledge(agent=agent, name="online_knowledge", args={"prompt": request.prompt}, message="")
+    response = await tool.execute()
+    return {"result": response.message}
+
+@app.post("/research-lite")
+async def research_lite(request: ResearchRequest):
+    agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
+    tool = knowledge_lite_tool.Knowledge(agent=agent, name="knowledge_lite", args={"prompt": request.prompt, "focus_mode": request.focus_mode}, message="")
     response = await tool.execute()
     return {"result": response.message}
 
