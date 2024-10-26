@@ -92,11 +92,11 @@ class Knowledge(Tool):
                 f"Perplexica Summary:\n{perplexica_result['message']}\n\n"
                 f"Source Content Summary:\n{sources_summary}\n\n"
                 "Focus on:\n"
-                "- Key findings and conclusions\n"
-                "- Specific data points and statistics\n"
-                "- Notable facts and details\n"
-                "- Direct quotes and references\n"
-                "- Technical specifications when present"
+                "- Synthesizing the key points from all summaries\n"
+                "- Important findings and conclusions\n"
+                "- Major themes and concepts\n"
+                "- Essential facts and details\n"
+                "- Core insights across sources"
             )
 
             # Create temporary config for o1-preview model
