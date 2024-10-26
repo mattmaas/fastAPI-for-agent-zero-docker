@@ -6,7 +6,7 @@ from agent import Agent
 from . import memory_tool
 from python.helpers.tool import Tool, Response
 from datetime import datetime
-from python.helpers import files, perplexity_search
+from python.helpers import files, perplexity_search, o1_preview
 from python.helpers.print_style import PrintStyle
 from python.helpers.research_logger import sanitize_filename
 

@@ -11,7 +11,7 @@ from agent import Agent
 from . import memory_tool
 from python.helpers.tool import Tool, Response
 from datetime import datetime
-from python.helpers import files, perplexity_search
+from python.helpers import files, perplexity_search, o1_preview
 from python.helpers.print_style import PrintStyle
 from python.helpers.research_logger import sanitize_filename
 
@@ -78,11 +78,7 @@ class Knowledge(Tool):
                 "- Present core insights across sources"
             )
 
-            executive_summary = await self.agent.send_adhoc_message(
-                system="You are an executive assistant tasked with creating concise, comprehensive summaries.",
-                msg=executive_summary_prompt,
-                output_label="Generating executive summary"
-            )
+            executive_summary = await o1_preview.generate_executive_summary(executive_summary_prompt)
 
             # Prepare and save the research document
             research_document = self.prepare_research_document(
