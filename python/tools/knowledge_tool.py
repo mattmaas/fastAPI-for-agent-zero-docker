@@ -151,7 +151,7 @@ class Knowledge(Tool):
             logger.debug("Preparing agent message")
             perplexica_summary = perplexica_result['message']
             perplexity_answer = perplexity_result
-            msg = await self.prepare_agent_message(perplexity_answer, perplexica_summary, research_file_path)
+            msg = await self.prepare_agent_message(perplexity_answer, perplexica_summary, research_file_path, executive_summary)
             logger.debug(f"Agent message prepared. Length: {len(msg)}")
 
             if await self.agent.handle_intervention(msg): 
@@ -225,7 +225,7 @@ class Knowledge(Tool):
 
         return document
 
-    async def prepare_agent_message(self, perplexity_answer, perplexica_summary, research_file_path, executive_summary):
+    async def prepare_agent_message(self, perplexity_answer, perplexica_summary, research_file_path):
         return f"Executive Summary:\n{executive_summary}\n\nDetailed research has been saved to: {research_file_path}"
     def fetch_full_content(self, url, research_file_path):
         try:
