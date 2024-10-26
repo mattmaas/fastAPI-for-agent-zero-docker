@@ -166,6 +166,7 @@ class ResearchRequest(BaseModel):
 
 @app.post("/research")
 async def research(request: ResearchRequest):
+    """Perform research using knowledge tools with specified focus mode."""
     agent = next(iter(agents.values())) if agents else Agent(number=0, config=config)
     tool = knowledge_tool.Knowledge(agent=agent, name="knowledge", args={"prompt": request.prompt, "focus_mode": request.focus_mode}, message="")
     response = await tool.execute()
