@@ -27,9 +27,9 @@ The `/research-lite` endpoint is handled by the `KnowledgeLite` tool defined in 
 - Saving the executive summary and key findings to the memory bank for future reference.
   - Ideal for situations requiring faster results with less computational overhead.
 
-## /perplexity
+## /perplexity_search
 
-The `/perplexity` endpoint utilizes the `perplexity_search` function defined in `python/helpers/perplexity_search.py`. It performs searches using the **Perplexity** API and returns concise answers based on the provided prompt.
+The `/perplexity_search` endpoint utilizes the `perplexity_search` function defined in `python/helpers/perplexity_search.py`. It performs searches using the **Perplexity** API and returns concise answers based on the provided prompt.
 
 - **Perplexity** is an AI-powered search engine that provides summarized information and direct answers from the web.
 - Communicates with the Perplexity API to fetch real-time information.
@@ -38,9 +38,9 @@ The `/perplexity` endpoint utilizes the `perplexity_search` function defined in 
   - This allows the agent to reference Perplexity's insights in subsequent tasks.
 - Useful for obtaining quick, succinct answers to specific queries without extensive processing.
 
-## /research-import
+## /import-research
 
-The `/research-import` endpoint is handled by the `ResearchImport` tool defined in `python/tools/research_import_tool.py`. It allows importing existing research documents into the agent's memory bank.
+The `/import-research` endpoint is handled by the `ResearchImport` tool defined in `python/tools/research_import_tool.py`. It allows importing existing research documents into the agent's memory bank.
 
 - Scans a specified directory for `.txt` research files.
 - Reads and processes each research document.
