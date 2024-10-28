@@ -1,69 +1,77 @@
-## Fork Overview
+## Enhanced Features Overview
 
-This fork adds an asynchronous FastAPI to the Agent Zero framework and also includes a Dockerfile for to easily run the original projecct in a self contained container. Key changes include:
+This fork enhances Agent Zero with a powerful FastAPI backend and comprehensive research capabilities. Key features include:
 
-- **FastAPI Integration**: The application now uses FastAPI to expose its functionalities as RESTful endpoints, allowing for easy interaction and integration with other services.
-- **Agent Execution Methods**: Two methods for running agents are provided:
-  - `run_agent`: Executes an agent synchronously, blocking until the task is complete.
-  - `run_agent_async`: Initiates an agent task asynchronously, allowing other operations to continue while the agent works.
-  - `research` - /Reserach endpoint now uses Pereplexica and SearXNG open source metadata search engine to generate sources and download FULL contents of up to 15 sources on a topic and summarize them and perplexica results using o1-mini from openai into an executive summary and saves it to the systems memories to "become an expert" on a subject. No longer uses duckduckgo. See the next section for more details.
-  - `research_lite` - /Research_lite endpoint does not get the full contents of the Perplexica sources. Also saves to vectorDb agent memory.
-  - `import-research` - /import-research imports knowledge and data stored in .txt documents into the agents' vectorDb memories.
-  - `perplexity_search` - Does a quick perplexity request and also saves the response to vectorDb memory.
-- **Asynchronous Enhancements**: Many operations have been refactored to be asynchronous, improving the responsiveness and scalability of the application.
-- **Dockerization**: The application is designed to run inside a Docker container, making it easy to deploy as a microservice. The Dockerfile has been updated to reflect these changes.
-- **Note on Docker**: Regular Dockerization features have been disabled in the code since the entire application is intended to run within a Docker container.
+- **Asynchronous API**: FastAPI integration enables both synchronous and asynchronous agent operations
+- **Advanced Research Pipeline**: 
+  - Full research with source extraction (`/research`)
+  - Quick research without full source parsing (`/research-lite`)
+  - Direct Perplexity API access (`/perplexity_search`)
+  - Research document importing (`/import-research`)
+- **Persistent Memory**: All research is automatically saved to vectorDB memory
+- **Docker Ready**: Includes Dockerfile for containerized deployment
 
-# Further API details
+## API Endpoints
 
-## /research
+### /research
+Comprehensive research endpoint that:
+- Searches using Perplexica and Perplexity APIs
+- Downloads and analyzes full source content
+- Generates executive summaries using OpenAI models
+- Saves everything to vectorDB memory
+- Returns detailed research documents
 
-The `/research` endpoint is handled by the `Knowledge` tool defined in `python/tools/knowledge_tool.py`. It performs comprehensive research based on a given prompt, engaging in an extensive process that includes:
+### /research-lite
+Faster alternative that:
+- Skips full source content download
+- Still provides quality summaries
+- Perfect for quick research needs
 
-- Performing **Perplexica** search to obtain detailed summaries and source URLs.
-  - **Perplexica** is an advanced search service that retrieves and summarizes relevant information from the web.
-- Fetching full source contents from the web and using the **o1-mini** model to extract important details with an intelligent prompt.
-  - This involves parsing websites, PDFs, and other media to gather comprehensive data.
-- Performing **Perplexity** search using the Perplexity API.
-  - **Perplexity** is an AI-powered search engine that provides concise answers and summaries from the web.
-- Combining all gathered information into a detailed executive summary using OpenAI's advanced models.
-  - The executive summary synthesizes Perplexica and Perplexity answers along with the extracted source details into a cohesive report.
-- Preparing and saving a comprehensive research document that includes the executive summary, detailed findings, and source references.
-- Saving key findings and summaries to the memory bank for future use and prompting.
-  - This enhances the agent's ability to recall and utilize past research in future interactions.
+### /perplexity_search
+Direct access to Perplexity API for:
+- Quick, focused searches
+- Real-time information retrieval
+- Automatic memory storage
 
-## /research-lite
+### /import-research
+Bulk import capability for:
+- Existing research documents
+- Automatic summarization
+- Memory bank integration
 
-The `/research-lite` endpoint is handled by the `KnowledgeLite` tool defined in `python/tools/knowledge_lite_tool.py`. It offers a streamlined research process distinct from `/research`, focusing on:
+## Smart Information Extraction
 
-- Performing **Perplexica** and **Perplexity** searches to quickly gather relevant information.
-- Generating an executive summary using OpenAI models without fetching full source contents.
-  - It uses the summaries from Perplexica and Perplexity directly.
-- Preparing and saving a concise research document that includes the executive summary and key findings.
-- Saving the executive summary and key findings to the memory bank for future reference.
-  - Ideal for situations requiring faster results with less computational overhead.
+The source summarization system is designed for maximum information retention by:
+- Preserving specific facts, measurements, and technical details
+- Maintaining contextual relationships
+- Capturing real-world examples and applications
+- Retaining significant quotes and temporal information
+- Avoiding oversimplification and generic summaries
 
-## /perplexity_search
+## Home Assistant Integration
 
-The `/perplexity_search` endpoint utilizes the `perplexity_search` function defined in `python/helpers/perplexity_search.py`. It performs searches using the **Perplexity** API and returns concise answers based on the provided prompt.
+This project can be integrated with Home Assistant through PyScript:
 
-- **Perplexity** is an AI-powered search engine that provides summarized information and direct answers from the web.
-- Communicates with the Perplexity API to fetch real-time information.
-- Handles messages, extracts responses, and logs interactions.
-- Saves the search results to the memory bank for future use and prompting.
-  - This allows the agent to reference Perplexity's insights in subsequent tasks.
-- Useful for obtaining quick, succinct answers to specific queries without extensive processing.
+1. Create a `pyscript` folder in your Home Assistant config directory
+2. Copy `pyscript_api.py` contents as `knowledge_api.py`
+3. Enable PyScript in configuration.yaml:
+```yaml
+pyscript:
+  allow_all_imports: true
+```
 
-## /import-research
+Example PyScript usage:
+```python
+@service
+def research_topic(topic):
+    return research(prompt=topic)
 
-The `/import-research` endpoint is handled by the `ResearchImport` tool defined in `python/tools/research_import_tool.py`. It allows importing existing research documents into the agent's memory bank.
+@service
+def quick_search(query):
+    return perplexity_search(prompt=query)
+```
 
-- Scans a specified directory for `.txt` research files.
-- Reads and processes each research document.
-- Uses OpenAI models to generate concise memory prompts that capture the essence of each document.
-- Saves both the original content and the generated prompts to the agent's memory bank.
-  - This enriches the agent's knowledge base for improved context and responsiveness in future interactions.
-- Facilitates the integration of external research into the agent's operational memory.
+This enables research capabilities directly in your home automation system. Remember to configure your API keys in Home Assistant's environment variables or secrets.yaml.
 
 # Agent Zero
 
