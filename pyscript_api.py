@@ -1,5 +1,7 @@
 import requests
 import json
+from pyscript import service, time_trigger
+from pyscript.util import log, task
 
 BASE_URL = "http://localhost:8766"
 
