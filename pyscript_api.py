@@ -1,12 +1,7 @@
 import requests
 import json
-import logging
 
-BASE_URL = "http://localhost:8765"
-OPENPERPLEX_URL = "http://localhost:8082"
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+BASE_URL = "http://localhost:8766"
 
 def process_response(response, endpoint_name):
     try:
@@ -20,54 +15,57 @@ def process_response(response, endpoint_name):
     except Exception as e:
         return {"error": f"Unexpected error in {endpoint_name}: {str(e)}"}
 
-def run_agent(prompt, timeout=None):
-    """Run an agent with a given prompt."""
+@service(supports_response="only")
+def run_agent(prompt):
+    """Run an agent thread with a given prompt."""
     url = f"{BASE_URL}/run_agent"
     data = {
-        "prompt": prompt,
-        "timeout": timeout
+        "prompt": prompt
     }
 
-    response = requests.post(url, json=data, timeout=300)  # 5 minutes
+    response = task.executor(requests.post, url, json=data)
     result = process_response(response, "run_agent")
-    logger.info(result)
+    log.info(result)
     return result
 
-def run_agent_async(prompt, timeout=None):
-    """Start an asynchronous agent task."""
+@service(supports_response="only")
+def run_agent_async(prompt):
+    """Start an asynchronous agent task thread."""
     url = f"{BASE_URL}/run_agent_async"
     data = {
-        "prompt": prompt,
-        "timeout": timeout
+        "prompt": prompt
     }
 
-    response = requests.post(url, json=data, timeout=1200)  # 20 minutes
+    response = task.executor(requests.post, url, json=data)
     result = process_response(response, "run_agent_async")
-    logger.info(result)
+    log.info(result)
     return result
 
-def remember(text):
-    """Save information to the agent's memory."""
+@service(supports_response="only")
+def remember(prompt):
+    """Save information to the your memory."""
     url = f"{BASE_URL}/remember"
-    data = {"prompt": text}
+    data = {"prompt": prompt}
 
-    response = requests.post(url, json=data, timeout=180)
+    response = task.executor(requests.post, url, json=data)
     result = process_response(response, "remember")
-    logger.info(result)
+    log.info(result)
     return result
 
+@service(supports_response="only")
 def forget(prompt):
-    """Remove information from the agent's memory."""
+    """Remove information from your memory. Forget memories."""
     url = f"{BASE_URL}/forget"
     data = {"prompt": prompt}
 
-    response = requests.post(url, json=data, timeout=180)
+    response = task.executor(requests.post, url, json=data)
     result = process_response(response, "forget")
-    logger.info(result)
+    log.info(result)
     return result
 
+@service(supports_response="only")
 def recall(prompt, count=5, threshold=0.1):
-    """Recall information from the agent's memory."""
+    """Recall information from the your memory on a given topic."""
     url = f"{BASE_URL}/recall"
     data = {
         "prompt": prompt,
@@ -75,48 +73,77 @@ def recall(prompt, count=5, threshold=0.1):
         "threshold": threshold
     }
 
-    response = requests.post(url, json=data, timeout=180)
+    response = task.executor(requests.post, url, json=data)
     result = process_response(response, "recall")
-    logger.info(result)
+    log.info(result)
     return result
 
-def research(prompt="", focus_mode="webSearch"):
-    """Perform research on a given topic."""
+@service(supports_response="only")
+def research(prompt):
+    """Recall memories & Perform research on a given topic. (Updates memory)"""
     url = f"{BASE_URL}/research"
-    data = {"prompt": prompt, "focus_mode": focus_mode}
+    data = {"prompt": prompt}
 
-    response = requests.post(url, json=data, timeout=180)
+    response = task.executor(requests.post, url, json=data)
     result = process_response(response, "research")
-    logger.info(result)
+    log.info(result)
     return result
 
-def perplexity_search(prompt=""):
-    """Perform a search using the Perplexity API."""
+@service(supports_response="only")
+def research_lite(prompt):
+    """Recall memories & Perform research with less sources and tokens used on a given topic.  (Updates memory)"""
+    url = f"{BASE_URL}/research_lite"
+    data = {"prompt": prompt}
+
+    response = task.executor(requests.post, url, json=data)
+    result = process_response(response, "research_lite")
+    log.info(result)
+    return result
+
+@service(supports_response="only")
+def perplexity_search(prompt):
+    """Recall memories & Perform a search using the Perplexity API. (Updates memory)"""
     url = f"{BASE_URL}/perplexity_search"
     data = {"prompt": prompt}
 
-    response = requests.post(url, json=data, timeout=600)  # 10 minutes
+    response = task.executor(requests.post, url, json=data)
     result = process_response(response, "perplexity_search")
-    logger.info(result)
+    log.info(result)
     return result
 
-def openperplex_search(prompt="", date_context="", stored_location="", pro_mode=True):
-    """Perform a search using the OpenPerplex API."""
-    url = f"{OPENPERPLEX_URL}/search"
-    params = {
-        "query": prompt,
-        "date_context": date_context,
-        "stored_location": stored_location,
-        "pro_mode": pro_mode
-    }
+@service(supports_response="only")
+def wolfram_alpha_search(prompt):
+    """Only call this function if requested by the user. Perform a Wolfram Alpha search on a given topic."""
+    url = f"{BASE_URL}/wolfram_alpha_search"
+    data = {"prompt": prompt}
 
-    response = requests.get(url, params=params, timeout=300)
-    result = process_response(response, "openperplex_search")
-    logger.info(result)
+    response = task.executor(requests.post, url, json=data)
+    result = process_response(response, "wolfram_alpha_search")
+    log.info(result)
     return result
 
+@service(supports_response="only")
+def youtube_search(prompt):
+    """Only call this function if requested by the user. Unless dircted otherwise, return the exact URLs found for the YouTube videos at the top of your answer to the user."""
+    url = f"{BASE_URL}/youtube_search"
+    data = {"prompt": prompt}
+
+    response = task.executor(requests.post, url, json=data)
+    result = process_response(response, "youtube_search")
+    log.info(result)
+    return result
+
+@service(supports_response="only")
+def reddit_search(prompt):
+    """Only call this function if requested by the user. Unless dircted otherwise, return the exact URLs found for the Reddit posts at the top of your answer to the user."""
+    url = f"{BASE_URL}/reddit_search"
+    data = {"prompt": prompt}
+
+    response = task.executor(requests.post, url, json=data)
+    result = process_response(response, "reddit_search")
+    log.info(result)
+    return result
+
+@time_trigger("startup")
 def initialize():
-    logger.info("API endpoints initialized")
-
-if __name__ == "__main__":
-    initialize()
+    log.info("API endpoints initialized")
