@@ -4,10 +4,12 @@ This fork enhances Agent Zero with a powerful FastAPI backend and comprehensive 
 
 - **Asynchronous API**: FastAPI integration enables both synchronous and asynchronous agent operations
 - **Advanced Research Pipeline**: 
-  - Full research with source extraction (`/research`)
-  - Quick research without full source parsing (`/research-lite`)
-  - Direct Perplexity API access (`/perplexity_search`)
-  - Research document importing (`/import-research`)
+  - Full research with source extraction, analysis and executive summaries (`/research`)
+  - Streamlined research without source parsing for rapid results (`/research-lite`) 
+  - Direct Perplexity API access with multiple search modes (`/perplexity_search`)
+  - Automated research document importing with memory integration (`/import-research`)
+  - All results automatically saved to persistent vectorDB memory
+  - Support for web, academic, and specialized search modes
 - **Persistent Memory**: All research is automatically saved to vectorDB memory
 - **Docker Ready**: Includes Dockerfile for containerized deployment
 
