@@ -4,12 +4,29 @@ This fork enhances Agent Zero with a powerful FastAPI backend and comprehensive 
 
 - **Asynchronous API**: FastAPI integration enables both synchronous and asynchronous agent operations
 - **Advanced Research Pipeline**: 
-  - Full research pipeline that does comprehensive research and saves the results to a txt document and agent vectorDb memory for future use. Gets FULL page contents of up to 15 Perplexica and SearXNG metadata search sources and Perplexity results and does analysis and executive summaries with o1-mini and o1-preview models (`/research`)
-  - Reserach-lite like /research using metadata searches without full source downloads (`/research-lite`) 
-  - Quick Perplexity API access (`/perplexity_search`)
-  - Automated research document importing with memory integration (`/import-research`)
-  - All results automatically saved to persistent vectorDB memory
-  - Support for web, academic, and specialized search modes
+  - Comprehensive research engine (`/research`) that:
+    - Performs parallel searches across Perplexica and SearXNG metadata APIs
+    - Downloads and deeply analyzes full page contents from up to 15 source URLs
+    - Generates detailed source summaries using o1-mini for content analysis
+    - Creates executive summaries using o1-preview for high-level synthesis
+    - Automatically saves everything to both vectorDB memory and structured text documents
+    - Integrates with persistent memory for future reference and knowledge building
+    
+  - Streamlined research option (`/research-lite`) providing:
+    - Same powerful metadata search capabilities without full content downloads
+    - Rapid results perfect for quick research needs
+    - Automatic memory storage and text document generation
+    
+  - Direct API access (`/perplexity_search`) featuring:
+    - Real-time Perplexity API integration
+    - Multiple specialized search modes (web, academic, Wolfram Alpha)
+    - Automatic result storage in vectorDB memory
+    
+  - Research document management (`/import-research`):
+    - Bulk import of existing research materials
+    - Automatic content analysis and summarization
+    - Full memory bank integration for knowledge preservation
+    - Support for various document formats including PDFs
 - **Persistent Memory**: All research is automatically saved to vectorDB memory
 - **Docker Ready**: Includes Dockerfile for containerized deployment
 
