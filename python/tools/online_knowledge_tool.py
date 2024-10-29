@@ -7,6 +7,9 @@ from python.helpers import research_logger
 import asyncio
 import os
 
+# Configure database directory
+DB_DIR = os.path.join(os.getcwd(), 'db')
+
 # Configure logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -14,6 +17,10 @@ logger.setLevel(logging.DEBUG)
 class OnlineKnowledge(Tool):
     async def execute(self, **kwargs):
         try:
+            # Ensure database directory exists with proper permissions
+            os.makedirs(DB_DIR, exist_ok=True)
+            os.chmod(DB_DIR, 0o777)  # Give full permissions to the directory
+            
             # Just do the perplexity search and memory recall
             perplexity_result = await perplexity_search.perplexity_search(self.args["prompt"])
             memories = await memory_tool.search(self.agent, self.args["prompt"])
