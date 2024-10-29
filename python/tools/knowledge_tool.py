@@ -111,11 +111,8 @@ class Knowledge(Tool):
                 logger.error(f"Error saving research document: {str(e)}")
                 raise
 
-            # Save Perplexica initial result to memory
-            await memory_tool.save(self.agent, f"Perplexica Search Answer for '{prompt}': {perplexica_result}")
-            
-            # Save Perplexity result to memory
-            await memory_tool.save(self.agent, f"Perplexity Search Answer for '{prompt}': {perplexity_result}")
+            # Save combined search results to memory once
+            await memory_tool.save(self.agent, f"Research Results for '{prompt}': Perplexica: {perplexica_result['message']}, Perplexity: {perplexity_result}")
 
 
             # Prepare the message for the agent
