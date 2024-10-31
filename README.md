@@ -2,7 +2,7 @@
 
 This fork enhances Agent Zero with a powerful FastAPI backend and comprehensive research capabilities. Key features include:
 
-- **Asynchronous API**: FastAPI integration enables both synchronous and asynchronous agent operations
+- **Asynchronous API**: FastAPI integration enables both synchronous and asynchronous persistant agent reserach and code execution operations over an API
 - **Advanced Research Pipeline**: 
   - Comprehensive research engine (`/research`) that:
     - Performs parallel searches across Perplexica and SearXNG metadata APIs
@@ -27,45 +27,9 @@ This fork enhances Agent Zero with a powerful FastAPI backend and comprehensive 
     - Automatic content analysis and summarization
     - Full memory bank integration for knowledge preservation
     - Support for various document formats including PDFs
-- **Persistent Memory**: All research is automatically saved to vectorDB memory
+
+  - Persistent Memory**: All research is automatically saved to vectorDB memory
 - **Docker Ready**: Includes Dockerfile for containerized deployment
-
-## API Endpoints
-
-### /research
-Comprehensive research endpoint that:
-- Searches using Perplexica and Perplexity APIs
-- Downloads and analyzes full source content
-- Generates executive summaries using OpenAI models
-- Saves everything to vectorDB memory
-- Returns detailed research documents
-
-### /research-lite
-Faster alternative that:
-- Skips full source content download
-- Still provides quality summaries
-- Perfect for quick research needs
-
-### /perplexity_search
-Direct access to Perplexity API for:
-- Quick, focused searches
-- Real-time information retrieval
-- Automatic memory storage
-
-### /import-research
-Bulk import capability for:
-- Existing research documents
-- Automatic summarization
-- Memory bank integration
-
-## Smart Information Extraction
-
-The source summarization system is designed for maximum information retention by:
-- Preserving specific facts, measurements, and technical details
-- Maintaining contextual relationships
-- Capturing real-world examples and applications
-- Retaining significant quotes and temporal information
-- Avoiding oversimplification and generic summaries
 
 ## Home Assistant Integration
 
